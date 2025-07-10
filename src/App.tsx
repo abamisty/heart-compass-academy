@@ -34,7 +34,14 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
-            <Route path="/child-dashboard" element={<ChildDashboard />} />
+            <Route 
+              path="/child-dashboard" 
+              element={
+                <ProtectedRoute>
+                  <ChildDashboard />
+                </ProtectedRoute>
+              } 
+            />
             <Route path="/course-player" element={<CoursePlayer />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
