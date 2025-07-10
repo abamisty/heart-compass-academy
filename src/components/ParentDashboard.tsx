@@ -27,6 +27,7 @@ import { LearningPathProgress } from "@/components/parent/LearningPathProgress";
 import { ProgressReports } from "@/components/parent/ProgressReports";
 import { AchievementTracking } from "@/components/parent/AchievementTracking";
 import { ParentControls } from "@/components/parent/ParentControls";
+import ChildProfileManagement from "@/components/parent/ChildProfileManagement";
 import { useToast } from "@/hooks/use-toast";
 
 const ParentDashboard = () => {
@@ -186,8 +187,9 @@ const ParentDashboard = () => {
 
         {/* Main Dashboard */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="children">Children</TabsTrigger>
             <TabsTrigger value="courses">Courses</TabsTrigger>
             <TabsTrigger value="learning-path">Learning Path</TabsTrigger>
             <TabsTrigger value="reports">Reports</TabsTrigger>
@@ -304,6 +306,10 @@ const ParentDashboard = () => {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="children" className="space-y-6">
+            <ChildProfileManagement />
           </TabsContent>
 
           <TabsContent value="courses" className="space-y-6">
