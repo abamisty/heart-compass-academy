@@ -179,11 +179,13 @@ const ChildProfileManagement = () => {
 
       if (editingChild) {
         // Update existing child
+        console.log("Updating existing child with ID:", editingChild.id);
         const { error } = await supabase
           .from('profiles')
           .update(childData)
           .eq('id', editingChild.id);
 
+        console.log("Update result:", { error });
         if (error) throw error;
 
         toast({
@@ -192,11 +194,17 @@ const ChildProfileManagement = () => {
         });
       } else {
         // Create new child
-        const { error } = await supabase
+        console.log("Creating new child profile");
+        const { data: insertResult, error } = await supabase
           .from('profiles')
-          .insert(childData);
+          .insert(childData)
+          .select();
 
-        if (error) throw error;
+        console.log("Insert result:", { insertResult, error });
+        if (error) {
+          console.error("Detailed error:", error);
+          throw error;
+        }
 
         toast({
           title: "Child profile created",
@@ -208,9 +216,21 @@ const ChildProfileManagement = () => {
       resetForm();
       loadChildren();
     } catch (error: any) {
+      console.error("Full error details:", error);
+      let errorMessage = error.message;
+      
+      // Provide more specific error messages
+      if (error.message?.includes('permission')) {
+        errorMessage = "Permission denied. Please ensure you're logged in as a parent.";
+      } else if (error.message?.includes('policy')) {
+        errorMessage = "Access policy error. Please contact support.";
+      } else if (error.message?.includes('recursion')) {
+        errorMessage = "Database configuration error. Please try again.";
+      }
+      
       toast({
         title: "Error saving child profile",
-        description: error.message,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
