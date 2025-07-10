@@ -20,10 +20,18 @@ import {
   Zap
 } from "lucide-react";
 
+// Import new components
+import { ChildProfileForm } from "@/components/parent/ChildProfileForm";
+import { CourseSelectionGrid } from "@/components/parent/CourseSelectionGrid";
+import { LearningPathProgress } from "@/components/parent/LearningPathProgress";
+import { ProgressReports } from "@/components/parent/ProgressReports";
+import { AchievementTracking } from "@/components/parent/AchievementTracking";
+import { ParentControls } from "@/components/parent/ParentControls";
+import { useToast } from "@/hooks/use-toast";
+
 const ParentDashboard = () => {
   const [selectedChild, setSelectedChild] = useState(0);
-
-  const children = [
+  const [children, setChildren] = useState([
     {
       id: 1,
       name: "Emma",
@@ -50,9 +58,28 @@ const ParentDashboard = () => {
       progress: 43,
       weeklyTime: 6.2
     }
-  ];
+  ]);
+  
+  const { toast } = useToast();
 
   const currentChild = children[selectedChild];
+
+  // Handler functions
+  const handleChildAdded = (newChild: any) => {
+    setChildren(prev => [...prev, newChild]);
+  };
+
+  const handleCourseEnroll = (courseId: string, childId: number) => {
+    toast({
+      title: "Course Enrolled",
+      description: `Successfully enrolled ${currentChild.name} in the selected course.`
+    });
+  };
+
+  const handleSettingsUpdate = (settings: any) => {
+    // Update child settings logic here
+    console.log("Settings updated:", settings);
+  };
 
   const recentActivities = [
     {
@@ -120,10 +147,9 @@ const ParentDashboard = () => {
                 <Settings className="w-4 h-4 mr-2" />
                 Settings
               </Button>
-              <Button variant="hero" size="sm">
-                <Plus className="w-4 h-4 mr-2" />
-                Add Child
-              </Button>
+              <div className="w-48">
+                <ChildProfileForm onChildAdded={handleChildAdded} />
+              </div>
             </div>
           </div>
         </div>
@@ -160,11 +186,13 @@ const ParentDashboard = () => {
 
         {/* Main Dashboard */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="progress">Progress</TabsTrigger>
             <TabsTrigger value="courses">Courses</TabsTrigger>
+            <TabsTrigger value="learning-path">Learning Path</TabsTrigger>
+            <TabsTrigger value="reports">Reports</TabsTrigger>
             <TabsTrigger value="achievements">Achievements</TabsTrigger>
+            <TabsTrigger value="controls">Controls</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
@@ -279,85 +307,29 @@ const ParentDashboard = () => {
           </TabsContent>
 
           <TabsContent value="courses" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Recommended Courses</CardTitle>
-                <CardDescription>
-                  AI-curated courses based on {currentChild.name}'s age, interests, and learning progress
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {recommendedCourses.map((course, index) => (
-                    <Card key={index} className="card-hover">
-                      <CardHeader>
-                        <CardTitle className="text-lg">{course.title}</CardTitle>
-                        <CardDescription>{course.description}</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-4">
-                          <div className="flex gap-2 flex-wrap">
-                            <Badge variant="secondary">Ages {course.ageGroup}</Badge>
-                            <Badge variant="outline">{course.duration}</Badge>
-                            <Badge variant="outline">{course.difficulty}</Badge>
-                          </div>
-                          <Button variant="hero" size="sm" className="w-full">
-                            Enroll {currentChild.name}
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            <CourseSelectionGrid 
+              selectedChild={currentChild}
+              onCourseEnroll={handleCourseEnroll}
+            />
+          </TabsContent>
+
+          <TabsContent value="learning-path" className="space-y-6">
+            <LearningPathProgress selectedChild={currentChild} />
+          </TabsContent>
+
+          <TabsContent value="reports" className="space-y-6">
+            <ProgressReports selectedChild={currentChild} />
           </TabsContent>
 
           <TabsContent value="achievements" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Achievement Gallery</CardTitle>
-                <CardDescription>
-                  Celebrate {currentChild.name}'s character development milestones
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                  {Array.from({ length: currentChild.totalBadges }).map((_, index) => (
-                    <div key={index} className="flex flex-col items-center p-4 rounded-lg bg-gradient-to-br from-primary/10 to-secondary/10 hover:from-primary/20 hover:to-secondary/20 transition-all duration-300 cursor-pointer">
-                      <Trophy className="w-8 h-8 text-primary mb-2" />
-                      <span className="text-xs text-center font-medium">Achievement {index + 1}</span>
-                    </div>
-                  ))}
-                  {Array.from({ length: 6 - (currentChild.totalBadges % 6) }).map((_, index) => (
-                    <div key={`placeholder-${index}`} className="flex flex-col items-center p-4 rounded-lg bg-muted/20 opacity-50">
-                      <Trophy className="w-8 h-8 text-muted-foreground mb-2" />
-                      <span className="text-xs text-center text-muted-foreground">Locked</span>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            <AchievementTracking selectedChild={currentChild} />
           </TabsContent>
 
-          <TabsContent value="progress" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Learning Analytics</CardTitle>
-                <CardDescription>
-                  Detailed insights into {currentChild.name}'s learning patterns and growth
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-12">
-                  <TrendingUp className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">Detailed Analytics Coming Soon</h3>
-                  <p className="text-muted-foreground">
-                    We're building comprehensive learning analytics to help you track progress over time.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+          <TabsContent value="controls" className="space-y-6">
+            <ParentControls 
+              selectedChild={currentChild}
+              onSettingsUpdate={handleSettingsUpdate}
+            />
           </TabsContent>
         </Tabs>
       </div>
