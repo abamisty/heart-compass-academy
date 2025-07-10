@@ -21,7 +21,6 @@ import {
 } from "lucide-react";
 
 // Import new components
-import { ChildProfileForm } from "@/components/parent/ChildProfileForm";
 import { CourseSelectionGrid } from "@/components/parent/CourseSelectionGrid";
 import { LearningPathProgress } from "@/components/parent/LearningPathProgress";
 import { ProgressReports } from "@/components/parent/ProgressReports";
@@ -32,6 +31,7 @@ import { useToast } from "@/hooks/use-toast";
 
 const ParentDashboard = () => {
   const [selectedChild, setSelectedChild] = useState(0);
+  const [isAddingChild, setIsAddingChild] = useState(false);
   const [children, setChildren] = useState([
     {
       id: 1,
@@ -156,7 +156,10 @@ const ParentDashboard = () => {
       <div className="container mx-auto px-6 py-8">
         {/* Add Child Button Section */}
         <div className="flex justify-end mb-6">
-          <ChildProfileForm onChildAdded={handleChildAdded} />
+          <Button onClick={() => setIsAddingChild(true)}>
+            <Plus className="w-4 h-4 mr-2" />
+            Add Child
+          </Button>
         </div>
         {/* Child Selector */}
         <div className="flex gap-4 mb-8">
@@ -310,7 +313,10 @@ const ParentDashboard = () => {
           </TabsContent>
 
           <TabsContent value="children" className="space-y-6">
-            <ChildProfileManagement />
+            <ChildProfileManagement 
+              isAddingChild={isAddingChild}
+              setIsAddingChild={setIsAddingChild}
+            />
           </TabsContent>
 
           <TabsContent value="courses" className="space-y-6">

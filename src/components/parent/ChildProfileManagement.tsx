@@ -29,13 +29,22 @@ interface ChildProfile {
   pin: string | null;
 }
 
-const ChildProfileManagement = () => {
+interface ChildProfileManagementProps {
+  isAddingChild?: boolean;
+  setIsAddingChild?: (value: boolean) => void;
+}
+
+const ChildProfileManagement = ({ isAddingChild: externalIsAddingChild, setIsAddingChild: externalSetIsAddingChild }: ChildProfileManagementProps = {}) => {
   const { toast } = useToast();
   const { user } = useAuth();
   const [children, setChildren] = useState<ChildProfile[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isAddingChild, setIsAddingChild] = useState(false);
+  const [internalIsAddingChild, setInternalIsAddingChild] = useState(false);
   const [editingChild, setEditingChild] = useState<ChildProfile | null>(null);
+
+  // Use external state if provided, otherwise use internal state
+  const isAddingChild = externalIsAddingChild !== undefined ? externalIsAddingChild : internalIsAddingChild;
+  const setIsAddingChild = externalSetIsAddingChild || setInternalIsAddingChild;
 
   // Form states
   const [firstName, setFirstName] = useState("");
@@ -294,126 +303,122 @@ const ChildProfileManagement = () => {
             Manage your children's avatars, PINs, and profile information
           </p>
         </div>
-        <Dialog open={isAddingChild} onOpenChange={setIsAddingChild}>
-          <DialogTrigger asChild>
-            <Button onClick={() => resetForm()}>
-              <Plus className="w-4 h-4 mr-2" />
-              Add Child
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>
-                {editingChild ? "Edit Child Profile" : "Add New Child"}
-              </DialogTitle>
-              <DialogDescription>
-                Set up your child's avatar and PIN for easy login
-              </DialogDescription>
-            </DialogHeader>
+      </div>
 
-            <div className="space-y-6">
-              {/* Basic Info */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
-                  <Input
-                    id="firstName"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    placeholder="Enter first name"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
-                  <Input
-                    id="lastName"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    placeholder="Enter last name"
-                  />
-                </div>
-              </div>
+      {/* Dialog for Add/Edit Child - controlled by parent component */}
+      <Dialog open={isAddingChild} onOpenChange={setIsAddingChild}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>
+              {editingChild ? "Edit Child Profile" : "Add New Child"}
+            </DialogTitle>
+            <DialogDescription>
+              Set up your child's avatar and PIN for easy login
+            </DialogDescription>
+          </DialogHeader>
 
+          <div className="space-y-6">
+            {/* Basic Info */}
+            <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="age">Age (optional)</Label>
+                <Label htmlFor="firstName">First Name</Label>
                 <Input
-                  id="age"
-                  type="number"
-                  min="3"
-                  max="18"
-                  value={age}
-                  onChange={(e) => setAge(e.target.value)}
-                  placeholder="Enter age"
+                  id="firstName"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="Enter first name"
                 />
               </div>
-
-              {/* Avatar Selection */}
-              <div className="space-y-3">
-                <Label className="flex items-center gap-2">
-                  <Palette className="w-4 h-4" />
-                  Choose Avatar
-                </Label>
-                <div className="grid grid-cols-4 gap-3">
-                  {avatarOptions.map((avatar) => (
-                    <button
-                      key={avatar.id}
-                      onClick={() => setSelectedAvatar(avatar.url)}
-                      className={`relative p-2 rounded-lg border-2 transition-all duration-200 hover:scale-105 ${
-                        selectedAvatar === avatar.url
-                          ? "border-primary ring-2 ring-primary/20"
-                          : "border-muted hover:border-primary/50"
-                      }`}
-                    >
-                      <Avatar className="w-full h-16 mx-auto">
-                        <AvatarImage src={avatar.url} alt={avatar.name} />
-                        <AvatarFallback>{avatar.name[0]}</AvatarFallback>
-                      </Avatar>
-                      <p className="text-xs text-center mt-1 text-muted-foreground">
-                        {avatar.name}
-                      </p>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* PIN Setup */}
-              <div className="space-y-3">
-                <Label className="flex items-center gap-2">
-                  <Key className="w-4 h-4" />
-                  Login PIN (4-6 digits)
-                </Label>
+              <div className="space-y-2">
+                <Label htmlFor="lastName">Last Name</Label>
                 <Input
-                  type="password"
-                  value={pin}
-                  onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  placeholder="Enter 4-6 digit PIN"
-                  maxLength={6}
+                  id="lastName"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  placeholder="Enter last name"
                 />
-                <p className="text-sm text-muted-foreground">
-                  Your child will use this PIN to log in after selecting their avatar
-                </p>
-              </div>
-
-              {/* Actions */}
-              <div className="flex gap-3 pt-4">
-                <Button onClick={handleSaveChild} className="flex-1">
-                  <Save className="w-4 h-4 mr-2" />
-                  {editingChild ? "Update Profile" : "Create Profile"}
-                </Button>
-                <Button 
-                  variant="outline" 
-                  onClick={() => {
-                    setIsAddingChild(false);
-                    resetForm();
-                  }}
-                >
-                  Cancel
-                </Button>
               </div>
             </div>
-          </DialogContent>
-        </Dialog>
-      </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="age">Age (optional)</Label>
+              <Input
+                id="age"
+                type="number"
+                min="3"
+                max="18"
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                placeholder="Enter age"
+              />
+            </div>
+
+            {/* Avatar Selection */}
+            <div className="space-y-3">
+              <Label className="flex items-center gap-2">
+                <Palette className="w-4 h-4" />
+                Choose Avatar
+              </Label>
+              <div className="grid grid-cols-4 gap-3">
+                {avatarOptions.map((avatar) => (
+                  <button
+                    key={avatar.id}
+                    onClick={() => setSelectedAvatar(avatar.url)}
+                    className={`relative p-2 rounded-lg border-2 transition-all duration-200 hover:scale-105 ${
+                      selectedAvatar === avatar.url
+                        ? "border-primary ring-2 ring-primary/20"
+                        : "border-muted hover:border-primary/50"
+                    }`}
+                  >
+                    <Avatar className="w-full h-16 mx-auto">
+                      <AvatarImage src={avatar.url} alt={avatar.name} />
+                      <AvatarFallback>{avatar.name[0]}</AvatarFallback>
+                    </Avatar>
+                    <p className="text-xs text-center mt-1 text-muted-foreground">
+                      {avatar.name}
+                    </p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* PIN Setup */}
+            <div className="space-y-3">
+              <Label className="flex items-center gap-2">
+                <Key className="w-4 h-4" />
+                Login PIN (4-6 digits)
+              </Label>
+              <Input
+                type="password"
+                value={pin}
+                onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                placeholder="Enter 4-6 digit PIN"
+                maxLength={6}
+              />
+              <p className="text-sm text-muted-foreground">
+                Your child will use this PIN to log in after selecting their avatar
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-3 pt-4">
+              <Button onClick={handleSaveChild} className="flex-1">
+                <Save className="w-4 h-4 mr-2" />
+                {editingChild ? "Update Profile" : "Create Profile"}
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setIsAddingChild(false);
+                  resetForm();
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Children List */}
       <div className="grid gap-4">
