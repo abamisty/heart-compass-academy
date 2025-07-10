@@ -24,8 +24,26 @@ const SignupPage = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement parent registration
+    
+    // Basic validation
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
+      alert("Please fill in all required fields");
+      return;
+    }
+    
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+    
+    if (!formData.agreeToTerms) {
+      alert("Please agree to the Terms of Service and Privacy Policy");
+      return;
+    }
+    
+    // TODO: Implement parent registration with Supabase
     console.log("Parent signup:", formData);
+    alert("Registration successful! (Demo mode)");
   };
 
   const features = [
