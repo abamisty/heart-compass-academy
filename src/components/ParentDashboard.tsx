@@ -191,9 +191,8 @@ const ParentDashboard = () => {
 
         {/* Main Dashboard */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="children">Children</TabsTrigger>
             <TabsTrigger value="courses">Courses</TabsTrigger>
             <TabsTrigger value="learning-path">Learning Path</TabsTrigger>
             <TabsTrigger value="reports">Reports</TabsTrigger>
@@ -312,13 +311,6 @@ const ParentDashboard = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="children" className="space-y-6">
-            <ChildProfileManagement 
-              isAddingChild={isAddingChild}
-              setIsAddingChild={setIsAddingChild}
-            />
-          </TabsContent>
-
           <TabsContent value="courses" className="space-y-6">
             <CourseSelectionGrid 
               selectedChild={currentChild}
@@ -345,6 +337,12 @@ const ParentDashboard = () => {
             />
           </TabsContent>
         </Tabs>
+
+        {/* Hidden Child Profile Management Dialog */}
+        <ChildProfileManagement 
+          isAddingChild={isAddingChild}
+          setIsAddingChild={setIsAddingChild}
+        />
       </div>
     </div>
   );
