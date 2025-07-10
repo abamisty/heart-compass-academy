@@ -420,69 +420,6 @@ const ChildProfileManagement = ({ isAddingChild: externalIsAddingChild, setIsAdd
         </DialogContent>
       </Dialog>
 
-      {/* Children List */}
-      <div className="grid gap-4">
-        {children.length === 0 ? (
-          <Card className="p-8 text-center">
-            <UserPlus className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-lg font-semibold mb-2">No children added yet</h3>
-            <p className="text-muted-foreground mb-4">
-              Add your first child profile to get started with their learning journey
-            </p>
-            <Button onClick={() => setIsAddingChild(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              Add Your First Child
-            </Button>
-          </Card>
-        ) : (
-          children.map((child) => (
-            <Card key={child.id} className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <Avatar className="w-16 h-16 ring-2 ring-primary/20">
-                    <AvatarImage src={child.avatar_url || ""} />
-                    <AvatarFallback className="text-lg font-bold">
-                      {child.first_name[0]}{child.last_name[0]}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h3 className="text-xl font-semibold">
-                      {child.first_name} {child.last_name}
-                    </h3>
-                    <div className="flex items-center gap-2 mt-1">
-                      {child.age && (
-                        <Badge variant="secondary">Age {child.age}</Badge>
-                      )}
-                      <Badge variant={child.pin ? "default" : "destructive"}>
-                        {child.pin ? "PIN Set" : "No PIN"}
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleEditChild(child)}
-                  >
-                    <Edit3 className="w-4 h-4 mr-1" />
-                    Edit
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleDeleteChild(child.id)}
-                    className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          ))
-        )}
-      </div>
-
       {/* Instructions */}
       {children.length > 0 && (
         <Card className="bg-primary/5 border-primary/20">
