@@ -86,6 +86,42 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_quests: {
+        Row: {
+          age_group: Database["public"]["Enums"]["age_group"] | null
+          created_at: string
+          description: string
+          heart_gems_reward: number
+          icon: string
+          id: string
+          is_active: boolean
+          quest_type: string
+          title: string
+        }
+        Insert: {
+          age_group?: Database["public"]["Enums"]["age_group"] | null
+          created_at?: string
+          description: string
+          heart_gems_reward?: number
+          icon: string
+          id?: string
+          is_active?: boolean
+          quest_type: string
+          title: string
+        }
+        Update: {
+          age_group?: Database["public"]["Enums"]["age_group"] | null
+          created_at?: string
+          description?: string
+          heart_gems_reward?: number
+          icon?: string
+          id?: string
+          is_active?: boolean
+          quest_type?: string
+          title?: string
+        }
+        Relationships: []
+      }
       enrollments: {
         Row: {
           child_id: string
@@ -287,6 +323,116 @@ export type Database = {
           {
             foreignKeyName: "profiles_parent_id_fkey"
             columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quest_completions: {
+        Row: {
+          child_id: string
+          completed_at: string
+          id: string
+          notes: string | null
+          quest_id: string
+        }
+        Insert: {
+          child_id: string
+          completed_at?: string
+          id?: string
+          notes?: string | null
+          quest_id: string
+        }
+        Update: {
+          child_id?: string
+          completed_at?: string
+          id?: string
+          notes?: string | null
+          quest_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quest_completions_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quest_completions_quest_id_fkey"
+            columns: ["quest_id"]
+            isOneToOne: false
+            referencedRelation: "daily_quests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      streaks: {
+        Row: {
+          child_id: string
+          current_streak: number
+          id: string
+          last_activity_date: string | null
+          longest_streak: number
+          updated_at: string
+        }
+        Insert: {
+          child_id: string
+          current_streak?: number
+          id?: string
+          last_activity_date?: string | null
+          longest_streak?: number
+          updated_at?: string
+        }
+        Update: {
+          child_id?: string
+          current_streak?: number
+          id?: string
+          last_activity_date?: string | null
+          longest_streak?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "streaks_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_badges: {
+        Row: {
+          badge_id: string
+          child_id: string
+          earned_at: string
+          id: string
+        }
+        Insert: {
+          badge_id: string
+          child_id: string
+          earned_at?: string
+          id?: string
+        }
+        Update: {
+          badge_id?: string
+          child_id?: string
+          earned_at?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_badges_child_id_fkey"
+            columns: ["child_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
