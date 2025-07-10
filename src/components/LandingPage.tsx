@@ -109,6 +109,31 @@ const LandingPage = () => {
             </Button>
           </div>
           
+          {/* Demo Access */}
+          <div className="mb-12">
+            <p className="text-lg text-muted-foreground mb-4">Try our demo dashboards:</p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to="/parent-dashboard">
+                <Button variant="secondary" size="lg">
+                  <Users className="w-5 h-5 mr-2" />
+                  Parent Dashboard Demo
+                </Button>
+              </Link>
+              <Link to="/child-dashboard">
+                <Button variant="accent" size="lg">
+                  <Heart className="w-5 h-5 mr-2" />
+                  Child Dashboard Demo
+                </Button>
+              </Link>
+              <Link to="/course-player">
+                <Button variant="success" size="lg">
+                  <BookOpen className="w-5 h-5 mr-2" />
+                  Course Player Demo
+                </Button>
+              </Link>
+            </div>
+          </div>
+          
           <div className="rounded-2xl overflow-hidden shadow-2xl mx-auto max-w-4xl">
             <img 
               src={heroImage} 
