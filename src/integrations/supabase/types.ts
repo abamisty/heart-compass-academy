@@ -451,6 +451,14 @@ export type Database = {
         Args: { user_uuid: string }
         Returns: string
       }
+      is_user_own_profile: {
+        Args: { profile_user_id: string }
+        Returns: boolean
+      }
+      is_user_parent_of_profile: {
+        Args: { profile_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       age_group: "foundational" | "growth" | "purpose"
