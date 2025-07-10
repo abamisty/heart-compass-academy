@@ -1,0 +1,15 @@
+-- Insert sample data
+-- Sample courses
+INSERT INTO public.courses (title, description, age_group, difficulty, duration_weeks, total_lessons, is_featured) VALUES
+('Character Values Foundations', 'Learn core values like respect, empathy, responsibility, and honesty through engaging activities and stories.', 'foundational', 'Beginner', 6, 12, true),
+('Life Skills Mastery', 'Develop essential life skills including emotional intelligence, communication, and decision-making abilities.', 'foundational', 'Beginner', 4, 8, true),
+('Public Speaking Confidence', 'Build confidence in expressing ideas and opinions through structured practice and feedback.', 'growth', 'Intermediate', 8, 16, true),
+('Financial Literacy & Sales Skills', 'Learn money management, budgeting, and ethical sales techniques for teens.', 'growth', 'Intermediate', 10, 20, false),
+('Leadership & Purpose Discovery', 'Explore personal mission, build leadership habits, and discover your life purpose.', 'purpose', 'Advanced', 12, 24, true),
+('Digital Citizenship', 'Navigate online relationships and digital responsibility in the modern world.', 'growth', 'Beginner', 4, 8, false);
+
+-- Sample lessons for first course
+INSERT INTO public.lessons (course_id, title, description, order_index, content, heart_gems_reward) VALUES
+((SELECT id FROM public.courses WHERE title = 'Character Values Foundations'), 'Understanding Emotions', 'Learn to identify and understand different emotions in yourself and others.', 1, '{"video_url": "", "quiz": {"question": "What is empathy?", "options": ["Feeling sorry for someone", "Understanding and sharing others feelings", "Ignoring others emotions", "Being emotional"], "correct": 1}, "reflection_prompt": "Think of a time when someone showed empathy to you. How did it make you feel?"}', 25),
+((SELECT id FROM public.courses WHERE title = 'Character Values Foundations'), 'Showing Respect', 'Discover different ways to show respect to family, friends, and community members.', 2, '{"video_url": "", "quiz": {"question": "Respect means:", "options": ["Only listening to adults", "Treating others how you want to be treated", "Always agreeing with everyone", "Being quiet all the time"], "correct": 1}, "reflection_prompt": "How can you show more respect to someone in your life this week?"}', 25),
+((SELECT id FROM public.courses WHERE title = 'Character Values Foundations'), 'Building Empathy', 'Learn to step into others shoes and understand different perspectives.', 3, '{"video_url": "", "quiz": {"question": "When your friend seems upset, what is the best first step?", "options": ["Tell them they should not feel that way", "Ask them how they are feeling and listen", "Change the subject to something fun", "Give them advice right away"], "correct": 1}, "reflection_prompt": "Can you think of a time when someone showed empathy to you?"}', 25);
