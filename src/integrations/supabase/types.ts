@@ -289,6 +289,7 @@ export type Database = {
           id: string
           last_name: string
           parent_id: string | null
+          pin: string | null
           role: Database["public"]["Enums"]["user_role"]
           updated_at: string
           user_id: string
@@ -302,6 +303,7 @@ export type Database = {
           id?: string
           last_name: string
           parent_id?: string | null
+          pin?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
           user_id: string
@@ -315,6 +317,7 @@ export type Database = {
           id?: string
           last_name?: string
           parent_id?: string | null
+          pin?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
           user_id?: string

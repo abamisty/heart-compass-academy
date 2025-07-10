@@ -186,7 +186,15 @@ const LoginPage = () => {
                 </TabsContent>
               </Tabs>
 
-              <div className="mt-6 pt-6 border-t border-border">
+              <div className="mt-6 pt-6 border-t border-border space-y-4">
+                <div className="text-center">
+                  <Link to="/child-login">
+                    <Button variant="outline" className="w-full">
+                      <User className="w-4 h-4 mr-2" />
+                      Child Login (PIN)
+                    </Button>
+                  </Link>
+                </div>
                 <div className="text-center text-sm">
                   <span className="text-muted-foreground">Don't have an account? </span>
                   <Link to="/signup" className="text-primary font-medium hover:underline">

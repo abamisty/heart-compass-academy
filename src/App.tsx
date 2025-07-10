@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import LoginPage from "./components/auth/LoginPage";
 import SignupPage from "./components/auth/SignupPage";
+import ChildLoginPage from "./components/auth/ChildLoginPage";
 import ParentDashboard from "./components/ParentDashboard";
 import ChildDashboard from "./components/ChildDashboard";
 import CoursePlayer from "./components/CoursePlayer";
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
+            <Route path="/child-login" element={<ChildLoginPage />} />
             <Route 
               path="/parent-dashboard" 
               element={
