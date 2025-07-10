@@ -148,15 +148,16 @@ const ParentDashboard = () => {
                 <Settings className="w-4 h-4 mr-2" />
                 Settings
               </Button>
-              <div className="w-48">
-                <ChildProfileForm onChildAdded={handleChildAdded} />
-              </div>
             </div>
           </div>
         </div>
       </header>
 
       <div className="container mx-auto px-6 py-8">
+        {/* Add Child Button Section */}
+        <div className="flex justify-end mb-6">
+          <ChildProfileForm onChildAdded={handleChildAdded} />
+        </div>
         {/* Child Selector */}
         <div className="flex gap-4 mb-8">
           {children.map((child, index) => (
