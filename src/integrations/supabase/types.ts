@@ -447,7 +447,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_profile_id: {
+        Args: { user_uuid: string }
+        Returns: string
+      }
     }
     Enums: {
       age_group: "foundational" | "growth" | "purpose"
