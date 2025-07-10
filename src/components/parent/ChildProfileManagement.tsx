@@ -135,16 +135,33 @@ const ChildProfileManagement = () => {
       return;
     }
 
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "You must be logged in to create child profiles",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
+      console.log("Current user:", user);
+      
       // Get parent profile
       const { data: parentProfile, error: parentError } = await supabase
         .from('profiles')
         .select('id')
-        .eq('user_id', user?.id)
+        .eq('user_id', user.id)
         .single();
 
+      console.log("Parent profile query result:", { parentProfile, parentError });
+
       if (parentError) throw parentError;
+
+      if (!parentProfile) {
+        throw new Error("Parent profile not found. Please ensure you have a profile set up.");
+      }
 
       const childData = {
         first_name: firstName.trim(),
@@ -157,6 +174,8 @@ const ChildProfileManagement = () => {
         email: `${firstName.toLowerCase()}.${lastName.toLowerCase()}@child.local`, // Placeholder email
         user_id: crypto.randomUUID() // Generate a fake user_id for child profiles
       };
+
+      console.log("Child data to insert:", childData);
 
       if (editingChild) {
         // Update existing child
