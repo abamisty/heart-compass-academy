@@ -14,7 +14,285 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      badges: {
+        Row: {
+          color: string
+          created_at: string
+          criteria: Json
+          description: string
+          icon: string
+          id: string
+          name: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          criteria?: Json
+          description: string
+          icon: string
+          id?: string
+          name: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          criteria?: Json
+          description?: string
+          icon?: string
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      courses: {
+        Row: {
+          age_group: Database["public"]["Enums"]["age_group"]
+          created_at: string
+          description: string
+          difficulty: string
+          duration_weeks: number
+          id: string
+          image_url: string | null
+          is_featured: boolean
+          title: string
+          total_lessons: number
+          updated_at: string
+        }
+        Insert: {
+          age_group: Database["public"]["Enums"]["age_group"]
+          created_at?: string
+          description: string
+          difficulty?: string
+          duration_weeks?: number
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean
+          title: string
+          total_lessons?: number
+          updated_at?: string
+        }
+        Update: {
+          age_group?: Database["public"]["Enums"]["age_group"]
+          created_at?: string
+          description?: string
+          difficulty?: string
+          duration_weeks?: number
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean
+          title?: string
+          total_lessons?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      enrollments: {
+        Row: {
+          child_id: string
+          completed_at: string | null
+          course_id: string
+          created_at: string
+          current_lesson_id: string | null
+          enrolled_by: string | null
+          id: string
+          progress_percentage: number
+          updated_at: string
+        }
+        Insert: {
+          child_id: string
+          completed_at?: string | null
+          course_id: string
+          created_at?: string
+          current_lesson_id?: string | null
+          enrolled_by?: string | null
+          id?: string
+          progress_percentage?: number
+          updated_at?: string
+        }
+        Update: {
+          child_id?: string
+          completed_at?: string | null
+          course_id?: string
+          created_at?: string
+          current_lesson_id?: string | null
+          enrolled_by?: string | null
+          id?: string
+          progress_percentage?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "enrollments_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enrollments_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enrollments_current_lesson_id_fkey"
+            columns: ["current_lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "enrollments_enrolled_by_fkey"
+            columns: ["enrolled_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lesson_progress: {
+        Row: {
+          child_id: string
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          heart_gems_earned: number
+          id: string
+          lesson_id: string
+          quiz_score: number | null
+          reflection_text: string | null
+        }
+        Insert: {
+          child_id: string
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          heart_gems_earned?: number
+          id?: string
+          lesson_id: string
+          quiz_score?: number | null
+          reflection_text?: string | null
+        }
+        Update: {
+          child_id?: string
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          heart_gems_earned?: number
+          id?: string
+          lesson_id?: string
+          quiz_score?: number | null
+          reflection_text?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_progress_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lesson_progress_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lessons: {
+        Row: {
+          content: Json
+          course_id: string
+          created_at: string
+          description: string | null
+          heart_gems_reward: number
+          id: string
+          order_index: number
+          title: string
+        }
+        Insert: {
+          content?: Json
+          course_id: string
+          created_at?: string
+          description?: string | null
+          heart_gems_reward?: number
+          id?: string
+          order_index: number
+          title: string
+        }
+        Update: {
+          content?: Json
+          course_id?: string
+          created_at?: string
+          description?: string | null
+          heart_gems_reward?: number
+          id?: string
+          order_index?: number
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lessons_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          age: number | null
+          avatar_url: string | null
+          created_at: string
+          email: string
+          first_name: string
+          id: string
+          last_name: string
+          parent_id: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          age?: number | null
+          avatar_url?: string | null
+          created_at?: string
+          email: string
+          first_name: string
+          id?: string
+          last_name: string
+          parent_id?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          age?: number | null
+          avatar_url?: string | null
+          created_at?: string
+          email?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          parent_id?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +301,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      age_group: "foundational" | "growth" | "purpose"
+      user_role: "parent" | "child"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +429,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      age_group: ["foundational", "growth", "purpose"],
+      user_role: ["parent", "child"],
+    },
   },
 } as const
