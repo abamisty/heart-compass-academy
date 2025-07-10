@@ -5,9 +5,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Heart, Users, ArrowRight, Shield, Star } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const SignupPage = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -22,28 +27,77 @@ const SignupPage = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Basic validation
     if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
-      alert("Please fill in all required fields");
+      toast({
+        title: "Please fill in all required fields",
+        variant: "destructive",
+      });
       return;
     }
     
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match");
+      toast({
+        title: "Passwords do not match",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (formData.password.length < 8) {
+      toast({
+        title: "Password must be at least 8 characters long",
+        variant: "destructive",
+      });
       return;
     }
     
     if (!formData.agreeToTerms) {
-      alert("Please agree to the Terms of Service and Privacy Policy");
+      toast({
+        title: "Please agree to the Terms of Service and Privacy Policy",
+        variant: "destructive",
+      });
       return;
     }
-    
-    // TODO: Implement parent registration with Supabase
-    console.log("Parent signup:", formData);
-    alert("Registration successful! (Demo mode)");
+
+    setLoading(true);
+
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+          },
+          emailRedirectTo: `${window.location.origin}/parent-dashboard`
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.user) {
+        toast({
+          title: "Account created successfully!",
+          description: "Please check your email to verify your account.",
+        });
+        navigate("/login?message=Please check your email to verify your account");
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error creating account",
+        description: error.message || "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const features = [
@@ -237,9 +291,15 @@ const SignupPage = () => {
                       </div>
                     </div>
 
-                    <Button type="submit" variant="hero" className="w-full" size="lg">
+                    <Button 
+                      type="submit" 
+                      variant="hero" 
+                      className="w-full" 
+                      size="lg"
+                      disabled={loading}
+                    >
                       <ArrowRight className="w-4 h-4 mr-2" />
-                      Start Free Trial
+                      {loading ? "Creating Account..." : "Start Free Trial"}
                     </Button>
                   </form>
 

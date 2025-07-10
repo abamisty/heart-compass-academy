@@ -1,28 +1,74 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Heart, Users, User, ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const LoginPage = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [searchParams] = useSearchParams();
+  const [loading, setLoading] = useState(false);
   const [parentEmail, setParentEmail] = useState("");
   const [parentPassword, setParentPassword] = useState("");
   const [childUsername, setChildUsername] = useState("");
   const [childPassword, setChildPassword] = useState("");
 
-  const handleParentLogin = (e: React.FormEvent) => {
+  useEffect(() => {
+    const message = searchParams.get("message");
+    if (message) {
+      toast({
+        title: "Account created",
+        description: message,
+      });
+    }
+  }, [searchParams, toast]);
+
+  const handleParentLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement parent authentication
-    console.log("Parent login:", { parentEmail, parentPassword });
+    setLoading(true);
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: parentEmail,
+        password: parentPassword,
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.user) {
+        toast({
+          title: "Welcome back!",
+          description: "Successfully signed in.",
+        });
+        navigate("/parent-dashboard");
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error signing in",
+        description: error.message || "Invalid email or password",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleChildLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement child authentication
-    console.log("Child login:", { childUsername, childPassword });
+    // For now, redirect to child dashboard demo
+    toast({
+      title: "Child login coming soon!",
+      description: "For now, try the child dashboard demo.",
+    });
+    navigate("/child-dashboard");
   };
 
   return (
@@ -86,9 +132,14 @@ const LoginPage = () => {
                         required
                       />
                     </div>
-                    <Button type="submit" variant="hero" className="w-full">
+                    <Button 
+                      type="submit" 
+                      variant="hero" 
+                      className="w-full"
+                      disabled={loading}
+                    >
                       <ArrowRight className="w-4 h-4 mr-2" />
-                      Sign In as Parent
+                      {loading ? "Signing In..." : "Sign In as Parent"}
                     </Button>
                   </form>
                   
