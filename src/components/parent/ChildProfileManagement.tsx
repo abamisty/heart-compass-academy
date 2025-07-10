@@ -48,11 +48,6 @@ const ChildProfileManagement = () => {
   const avatarOptions = [
     {
       id: "cat1",
-      url: "https://images.unsplash.com/photo-1582562124811-c09040d0a901?w=150&h=150&fit=crop&crop=face",
-      name: "Orange Cat"
-    },
-    {
-      id: "cat2", 
       url: "https://images.unsplash.com/photo-1535268647677-300dbf3d78d1?w=150&h=150&fit=crop&crop=face",
       name: "Grey Kitten"
     },
@@ -65,6 +60,11 @@ const ChildProfileManagement = () => {
       id: "penguin",
       url: "https://images.unsplash.com/photo-1441057206919-63d19fac2369?w=150&h=150&fit=crop&crop=face",
       name: "Penguin Duo"
+    },
+    {
+      id: "cat2",
+      url: "https://images.unsplash.com/photo-1574158622682-e40e69881006?w=150&h=150&fit=crop&crop=face",
+      name: "Cute Cat"
     }
   ];
 
