@@ -17,21 +17,21 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    /* Primary Brand Colors - Warm Purple */
-    --primary: 262 83% 58%;
+    /* Primary Brand Colors - Forest Green */
+    --primary: 120 45% 25%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 262 83% 78%;
+    --primary-glow: 120 45% 45%;
 
-    /* Secondary Colors - Soft Teal */
-    --secondary: 173 58% 39%;
+    /* Secondary Colors - Warm Brown */
+    --secondary: 30 25% 35%;
     --secondary-foreground: 0 0% 100%;
 
-    /* Accent Colors - Energetic Orange */
-    --accent: 25 95% 53%;
-    --accent-foreground: 0 0% 100%;
+    /* Accent Colors - Natural Gold */
+    --accent: 45 85% 55%;
+    --accent-foreground: 30 25% 15%;
 
-    /* Success & Achievement - Vibrant Green */
-    --success: 142 76% 36%;
+    /* Success & Achievement - Fresh Green */
+    --success: 135 60% 45%;
     --success-foreground: 0 0% 100%;
 
     /* Muted & Neutral */
@@ -45,21 +45,21 @@
     /* Borders & Inputs */
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 262 83% 58%;
+    --ring: 120 45% 25%;
 
     --radius: 1rem;
 
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(262 83% 58%), hsl(173 58% 39%));
-    --gradient-accent: linear-gradient(135deg, hsl(25 95% 53%), hsl(45 93% 47%));
-    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(173 58% 39%));
-    --gradient-warm: linear-gradient(135deg, hsl(262 83% 78%), hsl(25 95% 73%));
-    --gradient-hero: linear-gradient(135deg, hsl(248 100% 97%), hsl(262 83% 95%));
+    --gradient-primary: linear-gradient(135deg, hsl(120 45% 25%), hsl(30 25% 35%));
+    --gradient-accent: linear-gradient(135deg, hsl(45 85% 55%), hsl(60 75% 60%));
+    --gradient-success: linear-gradient(135deg, hsl(135 60% 45%), hsl(120 45% 45%));
+    --gradient-warm: linear-gradient(135deg, hsl(120 45% 45%), hsl(45 85% 65%));
+    --gradient-hero: linear-gradient(135deg, hsl(120 20% 95%), hsl(45 30% 90%));
 
     /* Shadows */
-    --shadow-glow: 0 10px 40px -12px hsl(262 83% 58% / 0.25);
+    --shadow-glow: 0 10px 40px -12px hsl(120 45% 25% / 0.25);
     --shadow-card: 0 4px 20px -4px hsl(222.2 84% 4.9% / 0.1);
-    --shadow-button: 0 6px 20px -6px hsl(262 83% 58% / 0.4);
+    --shadow-button: 0 6px 20px -6px hsl(120 45% 25% / 0.4);
 
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -68,12 +68,12 @@
     /* Sidebar */
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 262 83% 58%;
+    --sidebar-primary: 120 45% 25%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 262 83% 58%;
+    --sidebar-accent: 120 10% 95%;
+    --sidebar-accent-foreground: 120 15% 15%;
+    --sidebar-border: 120 15% 85%;
+    --sidebar-ring: 120 45% 25%;
   }
 
   .dark {
@@ -86,16 +86,16 @@
     --popover: 217.2 32.6% 17.5%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 262 83% 58%;
+    --primary: 120 45% 35%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 173 58% 39%;
+    --secondary: 30 25% 45%;
     --secondary-foreground: 0 0% 100%;
 
-    --accent: 25 95% 53%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 45 85% 65%;
+    --accent-foreground: 30 25% 15%;
 
-    --success: 142 76% 36%;
+    --success: 135 60% 50%;
     --success-foreground: 0 0% 100%;
 
     --muted: 217.2 32.6% 17.5%;
@@ -106,16 +106,16 @@
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 262 83% 58%;
+    --ring: 120 45% 35%;
 
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 262 83% 58%;
+    --sidebar-primary: 120 45% 35%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 262 83% 58%;
+    --sidebar-accent: 120 10% 20%;
+    --sidebar-accent-foreground: 120 15% 85%;
+    --sidebar-border: 120 10% 25%;
+    --sidebar-ring: 120 45% 35%;
   }
 }
 
@@ -137,7 +137,7 @@
 
   /* Achievement Badge */
   .achievement-badge {
-    @apply inline-flex items-center rounded-full px-3 py-1 text-sm font-medium bg-gradient-to-r from-accent to-orange-400 text-accent-foreground shadow-md;
+    @apply inline-flex items-center rounded-full px-3 py-1 text-sm font-medium bg-gradient-to-r from-accent to-yellow-400 text-accent-foreground shadow-md;
   }
 
   /* Progress Ring */
@@ -238,10 +238,10 @@
 
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 20px hsl(262 83% 58% / 0.4);
+    box-shadow: 0 0 20px hsl(120 45% 25% / 0.4);
   }
   50% {
-    box-shadow: 0 0 30px hsl(262 83% 58% / 0.6), 0 0 40px hsl(262 83% 58% / 0.3);
+    box-shadow: 0 0 30px hsl(120 45% 25% / 0.6), 0 0 40px hsl(120 45% 25% / 0.3);
   }
 }
 

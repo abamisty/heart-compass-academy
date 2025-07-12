@@ -100,10 +100,10 @@ export default {
 				},
 				'pulse-glow': {
 					'0%, 100%': {
-						boxShadow: '0 0 20px hsl(262 83% 58% / 0.4)'
+						boxShadow: '0 0 20px hsl(120 45% 25% / 0.4)'
 					},
 					'50%': {
-						boxShadow: '0 0 30px hsl(262 83% 58% / 0.6), 0 0 40px hsl(262 83% 58% / 0.3)'
+						boxShadow: '0 0 30px hsl(120 45% 25% / 0.6), 0 0 40px hsl(120 45% 25% / 0.3)'
 					}
 				},
 				'bounce-in': {
