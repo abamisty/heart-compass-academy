@@ -5,7 +5,6 @@ import { Badge } from "@/components/ui/badge";
 import { Heart, Star, Trophy, Users, BookOpen, Target, Zap, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-image.jpg";
-import familyLogo from "@/assets/family-education-logo.jpg";
 
 const LandingPage = () => {
   const features = [
@@ -69,11 +68,11 @@ const LandingPage = () => {
     <div className="min-h-screen bg-gradient-hero">
       {/* Navigation */}
       <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2">
           <img 
-            src={familyLogo} 
-            alt="ENTETEYE Family Education Logo" 
-            className="w-14 h-14 rounded-lg"
+            src="/lovable-uploads/0808fce6-2776-43ae-81cb-53ee64767e2e.png" 
+            alt="ENTETEYE Logo" 
+            className="w-12 h-12"
           />
           <span className="text-2xl font-bold gradient-text">ENTETEYE</span>
         </div>
@@ -234,9 +233,9 @@ const LandingPage = () => {
         <div className="container mx-auto px-6 text-center text-muted-foreground">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <img 
-              src={familyLogo} 
-              alt="ENTETEYE Family Education Logo" 
-              className="w-10 h-10 rounded-md"
+              src="/lovable-uploads/0808fce6-2776-43ae-81cb-53ee64767e2e.png" 
+              alt="ENTETEYE Logo" 
+              className="w-8 h-8"
             />
             <span className="text-xl font-bold gradient-text">ENTETEYE</span>
           </div>
