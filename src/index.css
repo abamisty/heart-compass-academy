@@ -170,6 +170,16 @@
     animation: float 3s ease-in-out infinite;
   }
 
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    33% { transform: translateY(-10px) rotate(1deg); }
+    66% { transform: translateY(5px) rotate(-1deg); }
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
   /* Pulse Glow Animation */
   .pulse-glow {
     animation: pulse-glow 2s ease-in-out infinite;

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,6 +6,8 @@ import { Progress } from "@/components/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { AnimatedCharacter } from "@/components/video/AnimatedCharacter";
+import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 import { 
   Play, 
   Pause, 
@@ -18,7 +20,8 @@ import {
   ArrowRight,
   Volume2,
   BookOpen,
-  RotateCcw
+  RotateCcw,
+  VolumeX
 } from "lucide-react";
 
 const CoursePlayer = () => {
@@ -28,6 +31,11 @@ const CoursePlayer = () => {
   const [currentActivity, setCurrentActivity] = useState("video");
   const [currentScene, setCurrentScene] = useState(0);
   const [videoProgress, setVideoProgress] = useState(0);
+  const [isMuted, setIsMuted] = useState(false);
+  const [currentSpeaker, setCurrentSpeaker] = useState<string | null>(null);
+  
+  const backgroundMusicRef = useRef<HTMLAudioElement | null>(null);
+  const { speak, stop: stopSpeech, isLoading: isSpeechLoading } = useTextToSpeech();
 
   const lessonData = {
     title: "Understanding Different Perspectives",
@@ -52,71 +60,150 @@ const CoursePlayer = () => {
     {
       id: 0,
       title: "Maya's Morning",
-      duration: 8,
+      duration: 12,
       description: "Maya wakes up feeling excited about her day",
-      characters: ["Maya"],
-      dialogue: "Maya stretches and smiles, ready for a great day!"
+      characters: [{ name: "Maya", emotion: "happy" as const, isActive: true }],
+      dialogue: "Maya stretches and smiles, looking forward to art class today. She can't wait to paint her favorite flower!",
+      speaker: "Maya",
+      voiceId: "pFZP5JQG7iQjIQuC4Bku" // Lily voice
     },
     {
       id: 1,
       title: "The Spilled Paint",
-      duration: 12,
+      duration: 15,
       description: "Maya accidentally knocks over paint in art class",
-      characters: ["Maya", "Teacher"],
-      dialogue: "Oh no! Maya's painting is ruined and paint is everywhere."
+      characters: [
+        { name: "Maya", emotion: "worried" as const, isActive: true },
+        { name: "Teacher", emotion: "empathetic" as const, isActive: false }
+      ],
+      dialogue: "Oh no! Maya's paintbrush slips and red paint spills all over her beautiful flower painting and the table.",
+      speaker: "Narrator",
+      voiceId: "EXAVITQu4vr4xnSDxMaL" // Sarah voice
     },
     {
       id: 2,
       title: "Friends' Reactions",
-      duration: 15,
+      duration: 20,
       description: "Different friends respond to Maya's accident",
-      characters: ["Maya", "Alex", "Sam", "Lily"],
-      dialogue: "Watch how each friend reacts differently to Maya's situation."
+      characters: [
+        { name: "Maya", emotion: "sad" as const, isActive: false },
+        { name: "Alex", emotion: "surprised" as const, isActive: false },
+        { name: "Sam", emotion: "happy" as const, isActive: false },
+        { name: "Lily", emotion: "empathetic" as const, isActive: true }
+      ],
+      dialogue: "Alex says 'Just clean it up quick!' Sam laughs and says 'At least it's colorful!' But Lily asks gently, 'Maya, how are you feeling about this?'",
+      speaker: "Narrator",
+      voiceId: "EXAVITQu4vr4xnSDxMaL" // Sarah voice
     },
     {
       id: 3,
       title: "Maya's Feelings",
-      duration: 10,
+      duration: 12,
       description: "Maya processes her emotions about the day",
-      characters: ["Maya"],
-      dialogue: "Maya feels frustrated and sad about what happened."
+      characters: [{ name: "Maya", emotion: "sad" as const, isActive: true }],
+      dialogue: "I feel really frustrated and embarrassed. I worked so hard on that painting and now it's ruined. Everyone can see my mistake.",
+      speaker: "Maya",
+      voiceId: "pFZP5JQG7iQjIQuC4Bku" // Lily voice
     },
     {
       id: 4,
       title: "Understanding & Support",
-      duration: 12,
+      duration: 15,
       description: "Maya receives empathy and feels better",
-      characters: ["Maya", "Lily"],
-      dialogue: "Lily sits with Maya and really listens to her feelings."
+      characters: [
+        { name: "Maya", emotion: "empathetic" as const, isActive: false },
+        { name: "Lily", emotion: "happy" as const, isActive: true }
+      ],
+      dialogue: "Lily sits with Maya and says, 'I understand you're upset. Accidents happen to everyone. Your painting was beautiful, and I know you can make another amazing one.'",
+      speaker: "Lily",
+      voiceId: "XrExE9yKIg1WjnnlVkGX" // Matilda voice
     }
   ];
 
   const totalVideoDuration = videoScenes.reduce((total, scene) => total + scene.duration, 0);
 
+  // Background music setup
+  useEffect(() => {
+    const audio = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
+    audio.loop = true;
+    audio.volume = 0.3;
+    backgroundMusicRef.current = audio;
+    
+    return () => {
+      if (backgroundMusicRef.current) {
+        backgroundMusicRef.current.pause();
+      }
+    };
+  }, []);
+
+  // Auto-play dialogue when scene changes
+  useEffect(() => {
+    if (isPlaying && !isMuted) {
+      const currentSceneData = videoScenes[currentScene];
+      const activeCharacter = currentSceneData.characters.find(char => char.isActive);
+      
+      setCurrentSpeaker(currentSceneData.speaker);
+      speak(currentSceneData.dialogue, { voiceId: currentSceneData.voiceId });
+    }
+  }, [currentScene, isPlaying, isMuted, speak]);
+
+  // Video progress and scene management
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isPlaying && currentScene < videoScenes.length) {
+      // Start background music
+      if (backgroundMusicRef.current && !isMuted) {
+        backgroundMusicRef.current.play().catch(console.error);
+      }
+      
       interval = setInterval(() => {
         setVideoProgress(prev => {
           const newProgress = prev + (100 / totalVideoDuration);
-          if (newProgress >= (videoScenes.slice(0, currentScene + 1).reduce((sum, scene) => sum + scene.duration, 0) / totalVideoDuration) * 100) {
+          const currentSceneEnd = (videoScenes.slice(0, currentScene + 1).reduce((sum, scene) => sum + scene.duration, 0) / totalVideoDuration) * 100;
+          
+          if (newProgress >= currentSceneEnd) {
             if (currentScene < videoScenes.length - 1) {
               setCurrentScene(prev => prev + 1);
             } else {
               setIsPlaying(false);
+              if (backgroundMusicRef.current) {
+                backgroundMusicRef.current.pause();
+              }
             }
           }
           return Math.min(newProgress, 100);
         });
       }, 1000);
+    } else {
+      // Pause background music
+      if (backgroundMusicRef.current) {
+        backgroundMusicRef.current.pause();
+      }
     }
+    
     return () => clearInterval(interval);
-  }, [isPlaying, currentScene, videoScenes.length, totalVideoDuration]);
+  }, [isPlaying, currentScene, videoScenes.length, totalVideoDuration, isMuted]);
 
   const resetVideo = () => {
     setCurrentScene(0);
     setVideoProgress(0);
     setIsPlaying(false);
+    setCurrentSpeaker(null);
+    stopSpeech();
+    if (backgroundMusicRef.current) {
+      backgroundMusicRef.current.pause();
+      backgroundMusicRef.current.currentTime = 0;
+    }
+  };
+
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+    if (backgroundMusicRef.current) {
+      backgroundMusicRef.current.muted = !isMuted;
+    }
+    if (isMuted) {
+      stopSpeech();
+    }
   };
 
   const handleAnswerSubmit = () => {
@@ -132,8 +219,13 @@ const CoursePlayer = () => {
       <Card className="border-0 bg-gradient-to-br from-primary/10 to-secondary/10">
         <CardContent className="p-8">
           {/* Video Scene Display */}
-          <div className="aspect-video bg-gradient-to-br from-slate-900 to-slate-800 rounded-lg mb-6 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20"></div>
+          <div className="aspect-video bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-lg mb-6 relative overflow-hidden">
+            {/* Animated background */}
+            <div className="absolute inset-0">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-secondary/10 animate-pulse"></div>
+              <div className="absolute top-0 left-0 w-32 h-32 bg-yellow-300/20 rounded-full blur-xl animate-float"></div>
+              <div className="absolute bottom-0 right-0 w-40 h-40 bg-blue-300/20 rounded-full blur-xl animate-float" style={{ animationDelay: '2s' }}></div>
+            </div>
             
             {/* Scene Content */}
             <div className="relative z-10 h-full flex flex-col">
@@ -141,91 +233,165 @@ const CoursePlayer = () => {
               <div className="p-4 bg-black/30 backdrop-blur-sm">
                 <div className="flex items-center justify-between text-white">
                   <h3 className="text-lg font-semibold">{currentSceneData.title}</h3>
-                  <Badge variant="secondary" className="text-xs">
-                    Scene {currentScene + 1} of {videoScenes.length}
-                  </Badge>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary" className="text-xs">
+                      Scene {currentScene + 1} of {videoScenes.length}
+                    </Badge>
+                    {currentSpeaker && (
+                      <Badge variant="outline" className="text-xs bg-primary/20">
+                        🎤 {currentSpeaker}
+                      </Badge>
+                    )}
+                  </div>
                 </div>
               </div>
 
-              {/* Scene Animation Area */}
+              {/* Characters Animation Area */}
               <div className="flex-1 relative flex items-center justify-center p-8">
-                {/* Character Animations */}
                 <div className="relative w-full h-full flex items-center justify-center">
+                  {/* Scene-specific character layouts */}
                   {currentScene === 0 && (
-                    <div className={`transition-all duration-1000 ${isPlaying ? 'animate-bounce' : ''}`}>
-                      <div className="w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full flex items-center justify-center mb-4">
-                        <span className="text-2xl">😊</span>
+                    <div className="flex flex-col items-center">
+                      <AnimatedCharacter 
+                        character="Maya" 
+                        emotion="happy" 
+                        isActive={currentSpeaker === "Maya"}
+                        size="lg"
+                        className="transform hover:scale-110 transition-transform"
+                      />
+                      <div className="mt-4 text-center">
+                        <div className="w-16 h-4 bg-yellow-400/30 rounded-full animate-pulse"></div>
+                        <p className="text-white text-xs mt-1">Feeling excited!</p>
                       </div>
-                      <p className="text-white text-center font-medium">Maya</p>
                     </div>
                   )}
 
                   {currentScene === 1 && (
                     <div className="flex items-center justify-center space-x-8">
-                      <div className={`transition-all duration-1000 ${isPlaying ? 'animate-pulse' : ''}`}>
-                        <div className="w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full flex items-center justify-center mb-2">
-                          <span className="text-xl">😰</span>
+                      <AnimatedCharacter 
+                        character="Maya" 
+                        emotion="worried" 
+                        isActive={currentSpeaker === "Maya"}
+                        size="lg"
+                      />
+                      <div className="relative">
+                        <div className="w-20 h-16 bg-red-500/80 rounded-lg relative overflow-hidden">
+                          <div className="absolute inset-0 bg-gradient-to-br from-red-400 to-red-600"></div>
+                          <div className="absolute bottom-0 w-full h-6 bg-red-400/60 rounded-b-lg animate-pulse"></div>
+                          <div className="absolute top-2 left-2 w-3 h-3 bg-red-300 rounded-full animate-bounce"></div>
+                          <div className="absolute top-4 right-3 w-2 h-2 bg-red-200 rounded-full animate-bounce" style={{ animationDelay: '0.5s' }}></div>
                         </div>
-                        <p className="text-white text-center text-sm">Maya</p>
+                        <p className="text-white text-center text-xs mt-2">Spilled Paint!</p>
                       </div>
-                      <div className={`transition-all duration-1000 ${isPlaying ? 'animate-fade-in' : ''}`}>
-                        <div className="w-16 h-16 bg-red-500 rounded-lg mb-2 relative">
-                          <div className="absolute inset-0 bg-gradient-to-br from-red-400 to-red-600 rounded-lg"></div>
-                          <div className="absolute bottom-0 w-full h-4 bg-red-400 rounded-b-lg animate-pulse"></div>
-                        </div>
-                        <p className="text-white text-center text-xs">Spilled Paint</p>
-                      </div>
+                      <AnimatedCharacter 
+                        character="Teacher" 
+                        emotion="empathetic" 
+                        isActive={currentSpeaker === "Teacher"}
+                        size="md"
+                      />
                     </div>
                   )}
 
                   {currentScene === 2 && (
-                    <div className="grid grid-cols-2 gap-6 w-full">
+                    <div className="grid grid-cols-2 gap-8 w-full max-w-lg">
                       <div className="text-center">
-                        <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center mb-2">
-                          <span className="text-lg">🤔</span>
+                        <AnimatedCharacter 
+                          character="Alex" 
+                          emotion="surprised" 
+                          isActive={currentSpeaker === "Alex"}
+                          size="md"
+                        />
+                        <div className="mt-2 p-2 bg-blue-500/20 rounded-lg">
+                          <p className="text-white text-xs">"Just clean it up!"</p>
                         </div>
-                        <p className="text-white text-xs">Alex: "Just clean it up"</p>
                       </div>
                       <div className="text-center">
-                        <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mb-2">
-                          <span className="text-lg">😕</span>
+                        <AnimatedCharacter 
+                          character="Sam" 
+                          emotion="happy" 
+                          isActive={currentSpeaker === "Sam"}
+                          size="md"
+                        />
+                        <div className="mt-2 p-2 bg-green-500/20 rounded-lg">
+                          <p className="text-white text-xs">"It's colorful!"</p>
                         </div>
-                        <p className="text-white text-xs">Sam: "That's too bad"</p>
                       </div>
-                      <div className="text-center col-span-2">
-                        <div className={`w-20 h-20 bg-gradient-to-br from-pink-400 to-pink-600 rounded-full flex items-center justify-center mb-2 mx-auto ${isPlaying ? 'animate-pulse' : ''}`}>
-                          <span className="text-xl">❤️</span>
+                      <div className="col-span-2 text-center">
+                        <AnimatedCharacter 
+                          character="Lily" 
+                          emotion="empathetic" 
+                          isActive={currentSpeaker === "Lily"}
+                          size="lg"
+                          className="mx-auto"
+                        />
+                        <div className="mt-2 p-3 bg-pink-500/20 rounded-lg border border-pink-300/30">
+                          <p className="text-white text-sm">"How are you feeling?"</p>
+                          <div className="flex justify-center mt-1">
+                            <Heart className="w-4 h-4 text-pink-300 animate-pulse" />
+                          </div>
                         </div>
-                        <p className="text-white text-sm">Lily: "How are you feeling?"</p>
+                      </div>
+                      <div className="col-span-2 flex justify-center">
+                        <AnimatedCharacter 
+                          character="Maya" 
+                          emotion="sad" 
+                          isActive={currentSpeaker === "Maya"}
+                          size="md"
+                        />
                       </div>
                     </div>
                   )}
 
                   {currentScene === 3 && (
-                    <div className={`transition-all duration-1000 ${isPlaying ? 'animate-pulse' : ''}`}>
-                      <div className="w-24 h-24 bg-gradient-to-br from-gray-400 to-gray-600 rounded-full flex items-center justify-center mb-4">
-                        <span className="text-2xl">😔</span>
+                    <div className="flex flex-col items-center space-y-4">
+                      <AnimatedCharacter 
+                        character="Maya" 
+                        emotion="sad" 
+                        isActive={currentSpeaker === "Maya"}
+                        size="lg"
+                      />
+                      <div className="text-center p-4 bg-gray-600/30 rounded-lg max-w-md">
+                        <p className="text-white text-sm mb-2">"I feel frustrated and embarrassed..."</p>
+                        <div className="flex justify-center space-x-2">
+                          <div className="w-2 h-8 bg-red-400/60 rounded"></div>
+                          <div className="w-2 h-6 bg-orange-400/60 rounded"></div>
+                          <div className="w-2 h-4 bg-yellow-400/60 rounded"></div>
+                        </div>
+                        <p className="text-xs text-gray-300 mt-1">Emotion levels</p>
                       </div>
-                      <p className="text-white text-center font-medium">Maya feels sad</p>
                     </div>
                   )}
 
                   {currentScene === 4 && (
-                    <div className="flex items-center justify-center space-x-6">
-                      <div className={`transition-all duration-1000 ${isPlaying ? 'animate-bounce' : ''}`}>
-                        <div className="w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full flex items-center justify-center mb-2">
-                          <span className="text-xl">😌</span>
+                    <div className="flex items-center justify-center space-x-8">
+                      <div className="text-center">
+                        <AnimatedCharacter 
+                          character="Maya" 
+                          emotion="empathetic" 
+                          isActive={currentSpeaker === "Maya"}
+                          size="lg"
+                        />
+                        <div className="mt-2 p-2 bg-green-500/20 rounded-lg">
+                          <p className="text-white text-xs">Feeling better</p>
                         </div>
-                        <p className="text-white text-center text-sm">Maya</p>
                       </div>
-                      <div className="w-8 h-8 text-red-400 animate-pulse">
-                        <Heart className="w-full h-full" />
+                      
+                      <div className="flex flex-col items-center space-y-2">
+                        <Heart className="w-8 h-8 text-red-400 animate-pulse" />
+                        <div className="w-16 h-1 bg-gradient-to-r from-pink-400 to-red-400 rounded animate-pulse"></div>
+                        <p className="text-white text-xs">Empathy</p>
                       </div>
-                      <div className={`transition-all duration-1000 ${isPlaying ? 'animate-bounce' : ''}`}>
-                        <div className="w-20 h-20 bg-gradient-to-br from-pink-400 to-pink-600 rounded-full flex items-center justify-center mb-2">
-                          <span className="text-xl">😊</span>
+                      
+                      <div className="text-center">
+                        <AnimatedCharacter 
+                          character="Lily" 
+                          emotion="happy" 
+                          isActive={currentSpeaker === "Lily"}
+                          size="lg"
+                        />
+                        <div className="mt-2 p-2 bg-pink-500/20 rounded-lg">
+                          <p className="text-white text-xs">Being supportive</p>
                         </div>
-                        <p className="text-white text-center text-sm">Lily</p>
                       </div>
                     </div>
                   )}
@@ -238,7 +404,7 @@ const CoursePlayer = () => {
                       size="lg"
                       variant="secondary"
                       onClick={() => setIsPlaying(true)}
-                      className="w-20 h-20 rounded-full"
+                      className="w-20 h-20 rounded-full shadow-lg hover:scale-110 transition-transform"
                     >
                       <Play className="w-8 h-8" />
                     </Button>
@@ -248,7 +414,16 @@ const CoursePlayer = () => {
 
               {/* Scene Dialogue */}
               <div className="p-4 bg-black/40 backdrop-blur-sm">
-                <p className="text-white text-center text-sm">{currentSceneData.dialogue}</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-white text-sm flex-1">{currentSceneData.dialogue}</p>
+                  {isSpeechLoading && (
+                    <div className="ml-4 flex space-x-1">
+                      <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                      <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -272,9 +447,18 @@ const CoursePlayer = () => {
                 <RotateCcw className="w-4 h-4" />
               </Button>
               <div className="flex items-center gap-2">
-                <Volume2 className="w-4 h-4 text-muted-foreground" />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={toggleMute}
+                >
+                  {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                </Button>
                 <div className="w-16 h-2 bg-muted rounded-full">
-                  <div className="w-12 h-2 bg-primary rounded-full"></div>
+                  <div 
+                    className="h-2 bg-primary rounded-full transition-all duration-300" 
+                    style={{ width: isMuted ? '0%' : '75%' }}
+                  ></div>
                 </div>
               </div>
             </div>
