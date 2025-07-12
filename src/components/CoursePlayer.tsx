@@ -34,7 +34,6 @@ const CoursePlayer = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [currentSpeaker, setCurrentSpeaker] = useState<string | null>(null);
   
-  const backgroundMusicRef = useRef<HTMLAudioElement | null>(null);
   const { speak, stop: stopSpeech, isLoading: isSpeechLoading } = useTextToSpeech();
 
   const lessonData = {
@@ -63,9 +62,9 @@ const CoursePlayer = () => {
       duration: 12,
       description: "Maya wakes up feeling excited about her day",
       characters: [{ name: "Maya", emotion: "happy" as const, isActive: true }],
-      dialogue: "Maya stretches and smiles, looking forward to art class today. She can't wait to paint her favorite flower!",
+      dialogue: "Good morning! I'm so excited about art class today. I can't wait to paint my favorite sunflower!",
       speaker: "Maya",
-      voiceId: "pFZP5JQG7iQjIQuC4Bku" // Lily voice
+      voiceId: "pFZP5JQG7iQjIQuC4Bku" // Lily voice - child-like
     },
     {
       id: 1,
@@ -76,9 +75,9 @@ const CoursePlayer = () => {
         { name: "Maya", emotion: "worried" as const, isActive: true },
         { name: "Teacher", emotion: "empathetic" as const, isActive: false }
       ],
-      dialogue: "Oh no! Maya's paintbrush slips and red paint spills all over her beautiful flower painting and the table.",
-      speaker: "Narrator",
-      voiceId: "EXAVITQu4vr4xnSDxMaL" // Sarah voice
+      dialogue: "Oh no! My paintbrush slipped and red paint is everywhere! My beautiful sunflower painting is completely ruined.",
+      speaker: "Maya",
+      voiceId: "pFZP5JQG7iQjIQuC4Bku" // Lily voice
     },
     {
       id: 2,
@@ -91,30 +90,56 @@ const CoursePlayer = () => {
         { name: "Sam", emotion: "happy" as const, isActive: false },
         { name: "Lily", emotion: "empathetic" as const, isActive: true }
       ],
-      dialogue: "Alex says 'Just clean it up quick!' Sam laughs and says 'At least it's colorful!' But Lily asks gently, 'Maya, how are you feeling about this?'",
-      speaker: "Narrator",
-      voiceId: "EXAVITQu4vr4xnSDxMaL" // Sarah voice
+      dialogue: "Hey Maya, accidents happen to everyone! Don't worry about it, just clean it up quickly.",
+      speaker: "Alex",
+      voiceId: "CwhRBWXzGAHq8TQ4Fs17" // Roger voice - casual friend
     },
     {
       id: 3,
+      title: "Sam's Response", 
+      duration: 8,
+      description: "Sam tries to lighten the mood",
+      characters: [
+        { name: "Maya", emotion: "sad" as const, isActive: false },
+        { name: "Sam", emotion: "happy" as const, isActive: true }
+      ],
+      dialogue: "Well, at least it's colorful now! It looks like abstract art. Maybe you started a new trend!",
+      speaker: "Sam",
+      voiceId: "TX3LPaxmHKxFdv7VOQHJ" // Liam voice - upbeat
+    },
+    {
+      id: 4,
+      title: "Lily's Empathy",
+      duration: 10,
+      description: "Lily shows empathy and asks about Maya's feelings",
+      characters: [
+        { name: "Maya", emotion: "sad" as const, isActive: false },
+        { name: "Lily", emotion: "empathetic" as const, isActive: true }
+      ],
+      dialogue: "Maya, I can see you're really upset about this. How are you feeling right now? I'm here to listen.",
+      speaker: "Lily",
+      voiceId: "XrExE9yKIg1WjnnlVkGX" // Matilda voice - empathetic
+    },
+    {
+      id: 5,
       title: "Maya's Feelings",
       duration: 12,
-      description: "Maya processes her emotions about the day",
+      description: "Maya expresses her emotions",
       characters: [{ name: "Maya", emotion: "sad" as const, isActive: true }],
-      dialogue: "I feel really frustrated and embarrassed. I worked so hard on that painting and now it's ruined. Everyone can see my mistake.",
+      dialogue: "I feel really frustrated and embarrassed. I worked so hard on that painting, and now everyone can see my mistake. I just wanted it to be perfect.",
       speaker: "Maya",
       voiceId: "pFZP5JQG7iQjIQuC4Bku" // Lily voice
     },
     {
-      id: 4,
+      id: 6,
       title: "Understanding & Support",
       duration: 15,
-      description: "Maya receives empathy and feels better",
+      description: "Lily provides support and understanding",
       characters: [
         { name: "Maya", emotion: "empathetic" as const, isActive: false },
         { name: "Lily", emotion: "happy" as const, isActive: true }
       ],
-      dialogue: "Lily sits with Maya and says, 'I understand you're upset. Accidents happen to everyone. Your painting was beautiful, and I know you can make another amazing one.'",
+      dialogue: "I understand you're upset, Maya. Your feelings are completely valid. You put your heart into that painting, and accidents like this are really disappointing. Would you like to paint another one together?",
       speaker: "Lily",
       voiceId: "XrExE9yKIg1WjnnlVkGX" // Matilda voice
     }
@@ -122,28 +147,18 @@ const CoursePlayer = () => {
 
   const totalVideoDuration = videoScenes.reduce((total, scene) => total + scene.duration, 0);
 
-  // Background music setup
+  // Auto-play dialogue when scene changes  
   useEffect(() => {
-    const audio = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
-    audio.loop = true;
-    audio.volume = 0.3;
-    backgroundMusicRef.current = audio;
-    
-    return () => {
-      if (backgroundMusicRef.current) {
-        backgroundMusicRef.current.pause();
-      }
-    };
-  }, []);
-
-  // Auto-play dialogue when scene changes
-  useEffect(() => {
-    if (isPlaying && !isMuted) {
+    if (isPlaying && !isMuted && currentScene < videoScenes.length) {
       const currentSceneData = videoScenes[currentScene];
-      const activeCharacter = currentSceneData.characters.find(char => char.isActive);
-      
       setCurrentSpeaker(currentSceneData.speaker);
-      speak(currentSceneData.dialogue, { voiceId: currentSceneData.voiceId });
+      
+      // Add a small delay to let the scene render first
+      const timer = setTimeout(() => {
+        speak(currentSceneData.dialogue, { voiceId: currentSceneData.voiceId });
+      }, 500);
+      
+      return () => clearTimeout(timer);
     }
   }, [currentScene, isPlaying, isMuted, speak]);
 
@@ -151,11 +166,6 @@ const CoursePlayer = () => {
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isPlaying && currentScene < videoScenes.length) {
-      // Start background music
-      if (backgroundMusicRef.current && !isMuted) {
-        backgroundMusicRef.current.play().catch(console.error);
-      }
-      
       interval = setInterval(() => {
         setVideoProgress(prev => {
           const newProgress = prev + (100 / totalVideoDuration);
@@ -166,23 +176,15 @@ const CoursePlayer = () => {
               setCurrentScene(prev => prev + 1);
             } else {
               setIsPlaying(false);
-              if (backgroundMusicRef.current) {
-                backgroundMusicRef.current.pause();
-              }
             }
           }
           return Math.min(newProgress, 100);
         });
       }, 1000);
-    } else {
-      // Pause background music
-      if (backgroundMusicRef.current) {
-        backgroundMusicRef.current.pause();
-      }
     }
     
     return () => clearInterval(interval);
-  }, [isPlaying, currentScene, videoScenes.length, totalVideoDuration, isMuted]);
+  }, [isPlaying, currentScene, videoScenes.length, totalVideoDuration]);
 
   const resetVideo = () => {
     setCurrentScene(0);
@@ -190,17 +192,10 @@ const CoursePlayer = () => {
     setIsPlaying(false);
     setCurrentSpeaker(null);
     stopSpeech();
-    if (backgroundMusicRef.current) {
-      backgroundMusicRef.current.pause();
-      backgroundMusicRef.current.currentTime = 0;
-    }
   };
 
   const toggleMute = () => {
     setIsMuted(!isMuted);
-    if (backgroundMusicRef.current) {
-      backgroundMusicRef.current.muted = !isMuted;
-    }
     if (isMuted) {
       stopSpeech();
     }
@@ -260,8 +255,10 @@ const CoursePlayer = () => {
                         className="transform hover:scale-110 transition-transform"
                       />
                       <div className="mt-4 text-center">
-                        <div className="w-16 h-4 bg-yellow-400/30 rounded-full animate-pulse"></div>
-                        <p className="text-white text-xs mt-1">Feeling excited!</p>
+                        <div className="w-20 h-6 bg-yellow-400/30 rounded-full animate-pulse">
+                          <div className="h-full bg-yellow-400/60 rounded-full" style={{ width: '80%' }}></div>
+                        </div>
+                        <p className="text-white text-sm mt-2 font-medium">Excited for art class!</p>
                       </div>
                     </div>
                   )}
@@ -275,63 +272,32 @@ const CoursePlayer = () => {
                         size="lg"
                       />
                       <div className="relative">
-                        <div className="w-20 h-16 bg-red-500/80 rounded-lg relative overflow-hidden">
+                        <div className="w-24 h-20 bg-red-500/80 rounded-lg relative overflow-hidden">
                           <div className="absolute inset-0 bg-gradient-to-br from-red-400 to-red-600"></div>
-                          <div className="absolute bottom-0 w-full h-6 bg-red-400/60 rounded-b-lg animate-pulse"></div>
-                          <div className="absolute top-2 left-2 w-3 h-3 bg-red-300 rounded-full animate-bounce"></div>
-                          <div className="absolute top-4 right-3 w-2 h-2 bg-red-200 rounded-full animate-bounce" style={{ animationDelay: '0.5s' }}></div>
+                          <div className="absolute bottom-0 w-full h-8 bg-red-400/60 rounded-b-lg animate-pulse"></div>
+                          <div className="absolute top-2 left-2 w-4 h-4 bg-red-300 rounded-full animate-bounce"></div>
+                          <div className="absolute top-4 right-3 w-3 h-3 bg-red-200 rounded-full animate-bounce" style={{ animationDelay: '0.5s' }}></div>
+                          <div className="absolute bottom-2 center w-3 h-3 bg-red-100 rounded-full animate-bounce" style={{ animationDelay: '1s' }}></div>
                         </div>
-                        <p className="text-white text-center text-xs mt-2">Spilled Paint!</p>
+                        <p className="text-white text-center text-sm mt-2 font-medium">Paint Disaster!</p>
                       </div>
-                      <AnimatedCharacter 
-                        character="Teacher" 
-                        emotion="empathetic" 
-                        isActive={currentSpeaker === "Teacher"}
-                        size="md"
-                      />
                     </div>
                   )}
 
                   {currentScene === 2 && (
-                    <div className="grid grid-cols-2 gap-8 w-full max-w-lg">
-                      <div className="text-center">
-                        <AnimatedCharacter 
-                          character="Alex" 
-                          emotion="surprised" 
-                          isActive={currentSpeaker === "Alex"}
-                          size="md"
-                        />
-                        <div className="mt-2 p-2 bg-blue-500/20 rounded-lg">
-                          <p className="text-white text-xs">"Just clean it up!"</p>
-                        </div>
+                    <div className="flex flex-col items-center space-y-6">
+                      <AnimatedCharacter 
+                        character="Alex" 
+                        emotion="surprised" 
+                        isActive={currentSpeaker === "Alex"}
+                        size="lg"
+                        className="mx-auto"
+                      />
+                      <div className="text-center p-4 bg-blue-500/20 rounded-lg border border-blue-300/30 max-w-sm">
+                        <p className="text-white text-sm font-medium">"Hey Maya, accidents happen!"</p>
+                        <p className="text-blue-200 text-xs mt-1">Alex tries to help practically</p>
                       </div>
-                      <div className="text-center">
-                        <AnimatedCharacter 
-                          character="Sam" 
-                          emotion="happy" 
-                          isActive={currentSpeaker === "Sam"}
-                          size="md"
-                        />
-                        <div className="mt-2 p-2 bg-green-500/20 rounded-lg">
-                          <p className="text-white text-xs">"It's colorful!"</p>
-                        </div>
-                      </div>
-                      <div className="col-span-2 text-center">
-                        <AnimatedCharacter 
-                          character="Lily" 
-                          emotion="empathetic" 
-                          isActive={currentSpeaker === "Lily"}
-                          size="lg"
-                          className="mx-auto"
-                        />
-                        <div className="mt-2 p-3 bg-pink-500/20 rounded-lg border border-pink-300/30">
-                          <p className="text-white text-sm">"How are you feeling?"</p>
-                          <div className="flex justify-center mt-1">
-                            <Heart className="w-4 h-4 text-pink-300 animate-pulse" />
-                          </div>
-                        </div>
-                      </div>
-                      <div className="col-span-2 flex justify-center">
+                      <div className="flex justify-center">
                         <AnimatedCharacter 
                           character="Maya" 
                           emotion="sad" 
@@ -343,6 +309,57 @@ const CoursePlayer = () => {
                   )}
 
                   {currentScene === 3 && (
+                    <div className="flex flex-col items-center space-y-6">
+                      <AnimatedCharacter 
+                        character="Sam" 
+                        emotion="happy" 
+                        isActive={currentSpeaker === "Sam"}
+                        size="lg"
+                        className="mx-auto"
+                      />
+                      <div className="text-center p-4 bg-green-500/20 rounded-lg border border-green-300/30 max-w-sm">
+                        <p className="text-white text-sm font-medium">"At least it's colorful now!"</p>
+                        <p className="text-green-200 text-xs mt-1">Sam tries to make light of it</p>
+                      </div>
+                      <div className="flex justify-center">
+                        <AnimatedCharacter 
+                          character="Maya" 
+                          emotion="sad" 
+                          isActive={currentSpeaker === "Maya"}
+                          size="md"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {currentScene === 4 && (
+                    <div className="flex flex-col items-center space-y-6">
+                      <AnimatedCharacter 
+                        character="Lily" 
+                        emotion="empathetic" 
+                        isActive={currentSpeaker === "Lily"}
+                        size="lg"
+                        className="mx-auto"
+                      />
+                      <div className="text-center p-4 bg-pink-500/20 rounded-lg border border-pink-300/30 max-w-md">
+                        <p className="text-white text-sm font-medium">"How are you feeling right now?"</p>
+                        <div className="flex justify-center mt-2">
+                          <Heart className="w-5 h-5 text-pink-300 animate-pulse" />
+                        </div>
+                        <p className="text-pink-200 text-xs mt-1">Lily shows true empathy</p>
+                      </div>
+                      <div className="flex justify-center">
+                        <AnimatedCharacter 
+                          character="Maya" 
+                          emotion="sad" 
+                          isActive={currentSpeaker === "Maya"}
+                          size="md"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {currentScene === 5 && (
                     <div className="flex flex-col items-center space-y-4">
                       <AnimatedCharacter 
                         character="Maya" 
@@ -351,18 +368,18 @@ const CoursePlayer = () => {
                         size="lg"
                       />
                       <div className="text-center p-4 bg-gray-600/30 rounded-lg max-w-md">
-                        <p className="text-white text-sm mb-2">"I feel frustrated and embarrassed..."</p>
-                        <div className="flex justify-center space-x-2">
-                          <div className="w-2 h-8 bg-red-400/60 rounded"></div>
-                          <div className="w-2 h-6 bg-orange-400/60 rounded"></div>
-                          <div className="w-2 h-4 bg-yellow-400/60 rounded"></div>
+                        <p className="text-white text-sm mb-3">"I feel frustrated and embarrassed..."</p>
+                        <div className="flex justify-center space-x-2 mb-2">
+                          <div className="w-3 h-10 bg-red-400/60 rounded" title="Frustration"></div>
+                          <div className="w-3 h-8 bg-orange-400/60 rounded" title="Embarrassment"></div>
+                          <div className="w-3 h-6 bg-yellow-400/60 rounded" title="Disappointment"></div>
                         </div>
-                        <p className="text-xs text-gray-300 mt-1">Emotion levels</p>
+                        <p className="text-xs text-gray-300">Maya's emotions</p>
                       </div>
                     </div>
                   )}
 
-                  {currentScene === 4 && (
+                  {currentScene === 6 && (
                     <div className="flex items-center justify-center space-x-8">
                       <div className="text-center">
                         <AnimatedCharacter 
@@ -372,14 +389,14 @@ const CoursePlayer = () => {
                           size="lg"
                         />
                         <div className="mt-2 p-2 bg-green-500/20 rounded-lg">
-                          <p className="text-white text-xs">Feeling better</p>
+                          <p className="text-white text-xs">Feeling understood</p>
                         </div>
                       </div>
                       
                       <div className="flex flex-col items-center space-y-2">
-                        <Heart className="w-8 h-8 text-red-400 animate-pulse" />
-                        <div className="w-16 h-1 bg-gradient-to-r from-pink-400 to-red-400 rounded animate-pulse"></div>
-                        <p className="text-white text-xs">Empathy</p>
+                        <Heart className="w-10 h-10 text-red-400 animate-pulse" />
+                        <div className="w-20 h-2 bg-gradient-to-r from-pink-400 to-red-400 rounded animate-pulse"></div>
+                        <p className="text-white text-sm font-medium">Connection</p>
                       </div>
                       
                       <div className="text-center">
@@ -390,7 +407,7 @@ const CoursePlayer = () => {
                           size="lg"
                         />
                         <div className="mt-2 p-2 bg-pink-500/20 rounded-lg">
-                          <p className="text-white text-xs">Being supportive</p>
+                          <p className="text-white text-xs">Offering support</p>
                         </div>
                       </div>
                     </div>
