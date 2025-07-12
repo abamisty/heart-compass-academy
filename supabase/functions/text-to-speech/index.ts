@@ -13,16 +13,24 @@ serve(async (req) => {
 
   try {
     const { text, voiceId, model } = await req.json()
+    
+    console.log('TTS Request received:', { text: text?.substring(0, 50) + '...', voiceId, model });
 
     if (!text) {
+      console.error('No text provided')
       throw new Error('Text is required')
     }
 
     const elevenLabsApiKey = Deno.env.get('ELEVENLABS_API_KEY')
+    console.log('API Key exists:', !!elevenLabsApiKey)
+    
     if (!elevenLabsApiKey) {
+      console.error('ElevenLabs API key not configured')
       throw new Error('ElevenLabs API key not configured')
     }
 
+    console.log('Making ElevenLabs API call with voice:', voiceId || 'pFZP5JQG7iQjIQuC4Bku')
+    
     // Generate speech using ElevenLabs
     const response = await fetch(
       `https://api.elevenlabs.io/v1/text-to-speech/${voiceId || 'pFZP5JQG7iQjIQuC4Bku'}`,
@@ -47,16 +55,23 @@ serve(async (req) => {
       }
     )
 
+    console.log('ElevenLabs response status:', response.status)
+    
     if (!response.ok) {
-      const error = await response.text()
-      throw new Error(`ElevenLabs API error: ${error}`)
+      const errorText = await response.text()
+      console.error('ElevenLabs API error:', errorText)
+      throw new Error(`ElevenLabs API error: ${response.status} - ${errorText}`)
     }
 
     // Convert audio to base64
     const arrayBuffer = await response.arrayBuffer()
+    console.log('Audio buffer size:', arrayBuffer.byteLength)
+    
     const base64Audio = btoa(
       String.fromCharCode(...new Uint8Array(arrayBuffer))
     )
+
+    console.log('Successfully generated audio, base64 length:', base64Audio.length)
 
     return new Response(
       JSON.stringify({ audioContent: base64Audio }),
@@ -66,10 +81,15 @@ serve(async (req) => {
     )
   } catch (error) {
     console.error('Error in text-to-speech function:', error)
+    console.error('Error stack:', error.stack)
+    
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error.message,
+        details: error.stack 
+      }),
       {
-        status: 400,
+        status: 500,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
     )

@@ -22,6 +22,8 @@ export const useTextToSpeech = () => {
         currentAudio.currentTime = 0;
       }
 
+      console.log('Calling text-to-speech with:', { text: text.substring(0, 50) + '...', voiceId: options.voiceId });
+
       const { data, error } = await supabase.functions.invoke('text-to-speech', {
         body: {
           text,
@@ -30,7 +32,12 @@ export const useTextToSpeech = () => {
         }
       });
 
-      if (error) throw error;
+      console.log('TTS Response:', { data, error });
+
+      if (error) {
+        console.error('TTS Error details:', error);
+        throw error;
+      }
 
       // Create audio element with enhanced settings for better quality
       const audio = new Audio(`data:audio/mpeg;base64,${data.audioContent}`);
