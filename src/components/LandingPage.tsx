@@ -72,7 +72,7 @@ const LandingPage = () => {
           <img 
             src="/lovable-uploads/0808fce6-2776-43ae-81cb-53ee64767e2e.png" 
             alt="ENTETEYE Logo" 
-            className="w-8 h-8"
+            className="w-12 h-12"
           />
           <span className="text-2xl font-bold gradient-text">ENTETEYE</span>
         </div>
@@ -235,7 +235,7 @@ const LandingPage = () => {
             <img 
               src="/lovable-uploads/0808fce6-2776-43ae-81cb-53ee64767e2e.png" 
               alt="ENTETEYE Logo" 
-              className="w-6 h-6"
+              className="w-8 h-8"
             />
             <span className="text-xl font-bold gradient-text">ENTETEYE</span>
           </div>
