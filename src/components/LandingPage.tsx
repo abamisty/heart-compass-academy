@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -68,7 +69,11 @@ const LandingPage = () => {
       {/* Navigation */}
       <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
         <div className="flex items-center space-x-2">
-          <Heart className="w-8 h-8 text-primary" />
+          <img 
+            src="/lovable-uploads/0808fce6-2776-43ae-81cb-53ee64767e2e.png" 
+            alt="ENTETEYE Logo" 
+            className="w-8 h-8"
+          />
           <span className="text-2xl font-bold gradient-text">ENTETEYE</span>
         </div>
         <div className="space-x-4">
@@ -227,7 +232,11 @@ const LandingPage = () => {
       <footer className="border-t border-border/50 py-8">
         <div className="container mx-auto px-6 text-center text-muted-foreground">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <Heart className="w-6 h-6 text-primary" />
+            <img 
+              src="/lovable-uploads/0808fce6-2776-43ae-81cb-53ee64767e2e.png" 
+              alt="ENTETEYE Logo" 
+              className="w-6 h-6"
+            />
             <span className="text-xl font-bold gradient-text">ENTETEYE</span>
           </div>
           <p>© 2024 ENTETEYE. Building character, shaping futures.</p>
