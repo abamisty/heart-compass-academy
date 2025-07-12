@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,7 +17,8 @@ import {
   CheckCircle2,
   ArrowRight,
   Volume2,
-  BookOpen
+  BookOpen,
+  RotateCcw
 } from "lucide-react";
 
 const CoursePlayer = () => {
@@ -25,6 +26,8 @@ const CoursePlayer = () => {
   const [selectedAnswer, setSelectedAnswer] = useState("");
   const [showResults, setShowResults] = useState(false);
   const [currentActivity, setCurrentActivity] = useState("video");
+  const [currentScene, setCurrentScene] = useState(0);
+  const [videoProgress, setVideoProgress] = useState(0);
 
   const lessonData = {
     title: "Understanding Different Perspectives",
@@ -45,51 +48,252 @@ const CoursePlayer = () => {
     ]
   };
 
+  const videoScenes = [
+    {
+      id: 0,
+      title: "Maya's Morning",
+      duration: 8,
+      description: "Maya wakes up feeling excited about her day",
+      characters: ["Maya"],
+      dialogue: "Maya stretches and smiles, ready for a great day!"
+    },
+    {
+      id: 1,
+      title: "The Spilled Paint",
+      duration: 12,
+      description: "Maya accidentally knocks over paint in art class",
+      characters: ["Maya", "Teacher"],
+      dialogue: "Oh no! Maya's painting is ruined and paint is everywhere."
+    },
+    {
+      id: 2,
+      title: "Friends' Reactions",
+      duration: 15,
+      description: "Different friends respond to Maya's accident",
+      characters: ["Maya", "Alex", "Sam", "Lily"],
+      dialogue: "Watch how each friend reacts differently to Maya's situation."
+    },
+    {
+      id: 3,
+      title: "Maya's Feelings",
+      duration: 10,
+      description: "Maya processes her emotions about the day",
+      characters: ["Maya"],
+      dialogue: "Maya feels frustrated and sad about what happened."
+    },
+    {
+      id: 4,
+      title: "Understanding & Support",
+      duration: 12,
+      description: "Maya receives empathy and feels better",
+      characters: ["Maya", "Lily"],
+      dialogue: "Lily sits with Maya and really listens to her feelings."
+    }
+  ];
+
+  const totalVideoDuration = videoScenes.reduce((total, scene) => total + scene.duration, 0);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (isPlaying && currentScene < videoScenes.length) {
+      interval = setInterval(() => {
+        setVideoProgress(prev => {
+          const newProgress = prev + (100 / totalVideoDuration);
+          if (newProgress >= (videoScenes.slice(0, currentScene + 1).reduce((sum, scene) => sum + scene.duration, 0) / totalVideoDuration) * 100) {
+            if (currentScene < videoScenes.length - 1) {
+              setCurrentScene(prev => prev + 1);
+            } else {
+              setIsPlaying(false);
+            }
+          }
+          return Math.min(newProgress, 100);
+        });
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isPlaying, currentScene, videoScenes.length, totalVideoDuration]);
+
+  const resetVideo = () => {
+    setCurrentScene(0);
+    setVideoProgress(0);
+    setIsPlaying(false);
+  };
+
   const handleAnswerSubmit = () => {
     setShowResults(true);
   };
 
-  const renderVideoActivity = () => (
-    <Card className="border-0 bg-gradient-to-br from-primary/10 to-secondary/10">
-      <CardContent className="p-8">
-        <div className="aspect-video bg-gradient-to-br from-slate-900 to-slate-800 rounded-lg flex items-center justify-center mb-6 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20"></div>
-          <div className="relative z-10 text-center text-white">
-            <div className="w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center mb-4 mx-auto">
-              {isPlaying ? (
-                <Pause className="w-8 h-8" />
-              ) : (
-                <Play className="w-8 h-8" />
-              )}
-            </div>
-            <h3 className="text-lg font-semibold mb-2">Story: Maya's Difficult Day</h3>
-            <p className="text-sm opacity-80">Watch how different characters respond to Maya's feelings</p>
-          </div>
-        </div>
-        
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-4">
-            <Button 
-              variant="secondary" 
-              size="sm"
-              onClick={() => setIsPlaying(!isPlaying)}
-            >
-              {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-            </Button>
-            <div className="flex items-center gap-2">
-              <Volume2 className="w-4 h-4 text-muted-foreground" />
-              <div className="w-16 h-2 bg-muted rounded-full">
-                <div className="w-12 h-2 bg-primary rounded-full"></div>
+  const renderVideoActivity = () => {
+    const currentSceneData = videoScenes[currentScene];
+    const currentTime = Math.floor((videoProgress / 100) * totalVideoDuration);
+    const totalTime = totalVideoDuration;
+
+    return (
+      <Card className="border-0 bg-gradient-to-br from-primary/10 to-secondary/10">
+        <CardContent className="p-8">
+          {/* Video Scene Display */}
+          <div className="aspect-video bg-gradient-to-br from-slate-900 to-slate-800 rounded-lg mb-6 relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20"></div>
+            
+            {/* Scene Content */}
+            <div className="relative z-10 h-full flex flex-col">
+              {/* Scene Header */}
+              <div className="p-4 bg-black/30 backdrop-blur-sm">
+                <div className="flex items-center justify-between text-white">
+                  <h3 className="text-lg font-semibold">{currentSceneData.title}</h3>
+                  <Badge variant="secondary" className="text-xs">
+                    Scene {currentScene + 1} of {videoScenes.length}
+                  </Badge>
+                </div>
+              </div>
+
+              {/* Scene Animation Area */}
+              <div className="flex-1 relative flex items-center justify-center p-8">
+                {/* Character Animations */}
+                <div className="relative w-full h-full flex items-center justify-center">
+                  {currentScene === 0 && (
+                    <div className={`transition-all duration-1000 ${isPlaying ? 'animate-bounce' : ''}`}>
+                      <div className="w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full flex items-center justify-center mb-4">
+                        <span className="text-2xl">😊</span>
+                      </div>
+                      <p className="text-white text-center font-medium">Maya</p>
+                    </div>
+                  )}
+
+                  {currentScene === 1 && (
+                    <div className="flex items-center justify-center space-x-8">
+                      <div className={`transition-all duration-1000 ${isPlaying ? 'animate-pulse' : ''}`}>
+                        <div className="w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full flex items-center justify-center mb-2">
+                          <span className="text-xl">😰</span>
+                        </div>
+                        <p className="text-white text-center text-sm">Maya</p>
+                      </div>
+                      <div className={`transition-all duration-1000 ${isPlaying ? 'animate-fade-in' : ''}`}>
+                        <div className="w-16 h-16 bg-red-500 rounded-lg mb-2 relative">
+                          <div className="absolute inset-0 bg-gradient-to-br from-red-400 to-red-600 rounded-lg"></div>
+                          <div className="absolute bottom-0 w-full h-4 bg-red-400 rounded-b-lg animate-pulse"></div>
+                        </div>
+                        <p className="text-white text-center text-xs">Spilled Paint</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {currentScene === 2 && (
+                    <div className="grid grid-cols-2 gap-6 w-full">
+                      <div className="text-center">
+                        <div className="w-16 h-16 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center mb-2">
+                          <span className="text-lg">🤔</span>
+                        </div>
+                        <p className="text-white text-xs">Alex: "Just clean it up"</p>
+                      </div>
+                      <div className="text-center">
+                        <div className="w-16 h-16 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mb-2">
+                          <span className="text-lg">😕</span>
+                        </div>
+                        <p className="text-white text-xs">Sam: "That's too bad"</p>
+                      </div>
+                      <div className="text-center col-span-2">
+                        <div className={`w-20 h-20 bg-gradient-to-br from-pink-400 to-pink-600 rounded-full flex items-center justify-center mb-2 mx-auto ${isPlaying ? 'animate-pulse' : ''}`}>
+                          <span className="text-xl">❤️</span>
+                        </div>
+                        <p className="text-white text-sm">Lily: "How are you feeling?"</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {currentScene === 3 && (
+                    <div className={`transition-all duration-1000 ${isPlaying ? 'animate-pulse' : ''}`}>
+                      <div className="w-24 h-24 bg-gradient-to-br from-gray-400 to-gray-600 rounded-full flex items-center justify-center mb-4">
+                        <span className="text-2xl">😔</span>
+                      </div>
+                      <p className="text-white text-center font-medium">Maya feels sad</p>
+                    </div>
+                  )}
+
+                  {currentScene === 4 && (
+                    <div className="flex items-center justify-center space-x-6">
+                      <div className={`transition-all duration-1000 ${isPlaying ? 'animate-bounce' : ''}`}>
+                        <div className="w-20 h-20 bg-gradient-to-br from-yellow-400 to-orange-400 rounded-full flex items-center justify-center mb-2">
+                          <span className="text-xl">😌</span>
+                        </div>
+                        <p className="text-white text-center text-sm">Maya</p>
+                      </div>
+                      <div className="w-8 h-8 text-red-400 animate-pulse">
+                        <Heart className="w-full h-full" />
+                      </div>
+                      <div className={`transition-all duration-1000 ${isPlaying ? 'animate-bounce' : ''}`}>
+                        <div className="w-20 h-20 bg-gradient-to-br from-pink-400 to-pink-600 rounded-full flex items-center justify-center mb-2">
+                          <span className="text-xl">😊</span>
+                        </div>
+                        <p className="text-white text-center text-sm">Lily</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Play/Pause Overlay */}
+                {!isPlaying && videoProgress === 0 && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm">
+                    <Button 
+                      size="lg"
+                      variant="secondary"
+                      onClick={() => setIsPlaying(true)}
+                      className="w-20 h-20 rounded-full"
+                    >
+                      <Play className="w-8 h-8" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+
+              {/* Scene Dialogue */}
+              <div className="p-4 bg-black/40 backdrop-blur-sm">
+                <p className="text-white text-center text-sm">{currentSceneData.dialogue}</p>
               </div>
             </div>
           </div>
-          <Badge variant="secondary">3:45 / 5:20</Badge>
-        </div>
-        
-        <Progress value={65} className="h-2" />
-      </CardContent>
-    </Card>
-  );
+          
+          {/* Video Controls */}
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-4">
+              <Button 
+                variant="secondary" 
+                size="sm"
+                onClick={() => setIsPlaying(!isPlaying)}
+                disabled={videoProgress >= 100}
+              >
+                {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={resetVideo}
+              >
+                <RotateCcw className="w-4 h-4" />
+              </Button>
+              <div className="flex items-center gap-2">
+                <Volume2 className="w-4 h-4 text-muted-foreground" />
+                <div className="w-16 h-2 bg-muted rounded-full">
+                  <div className="w-12 h-2 bg-primary rounded-full"></div>
+                </div>
+              </div>
+            </div>
+            <Badge variant="secondary">
+              {Math.floor(currentTime / 60)}:{(currentTime % 60).toString().padStart(2, '0')} / {Math.floor(totalTime / 60)}:{(totalTime % 60).toString().padStart(2, '0')}
+            </Badge>
+          </div>
+          
+          {/* Progress Bar */}
+          <Progress value={videoProgress} className="h-3 mb-4" />
+          
+          {/* Scene Description */}
+          <div className="text-center">
+            <p className="text-muted-foreground text-sm">{currentSceneData.description}</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
 
   const renderQuizActivity = () => (
     <Card className="border-0 bg-gradient-to-br from-accent/10 to-orange-100">
