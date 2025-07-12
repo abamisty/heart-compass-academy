@@ -25,28 +25,46 @@ export const useTextToSpeech = () => {
       const { data, error } = await supabase.functions.invoke('text-to-speech', {
         body: {
           text,
-          voiceId: options.voiceId,
-          model: options.model
+          voiceId: options.voiceId || 'pFZP5JQG7iQjIQuC4Bku',
+          model: options.model || 'eleven_multilingual_v2'
         }
       });
 
       if (error) throw error;
 
-      // Create audio element and play
+      // Create audio element with enhanced settings for better quality
       const audio = new Audio(`data:audio/mpeg;base64,${data.audioContent}`);
+      audio.volume = 0.9; // Increase volume for better audibility
+      audio.preload = 'auto';
       setCurrentAudio(audio);
       
-      await new Promise((resolve, reject) => {
-        audio.onended = resolve;
-        audio.onerror = reject;
-        audio.play();
+      // Enhanced promise handling for smooth playback
+      return new Promise((resolve, reject) => {
+        audio.onloadeddata = () => {
+          audio.play().then(resolve).catch(reject);
+        };
+        audio.onended = () => {
+          setCurrentAudio(null);
+          resolve(undefined);
+        };
+        audio.onerror = () => {
+          setCurrentAudio(null);
+          reject(new Error('Audio playback failed'));
+        };
+        audio.oncanplaythrough = () => {
+          // Audio is ready to play without interruption
+          if (audio.paused) {
+            audio.play().catch(reject);
+          }
+        };
       });
 
     } catch (error) {
       console.error('Text-to-speech error:', error);
+      setCurrentAudio(null);
+      throw error;
     } finally {
       setIsLoading(false);
-      setCurrentAudio(null);
     }
   }, [currentAudio]);
 

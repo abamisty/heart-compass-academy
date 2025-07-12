@@ -33,6 +33,8 @@ const CoursePlayer = () => {
   const [videoProgress, setVideoProgress] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
   const [currentSpeaker, setCurrentSpeaker] = useState<string | null>(null);
+  const [isSceneTransitioning, setIsSceneTransitioning] = useState(false);
+  const [speechProgress, setSpeechProgress] = useState(0);
   
   const { speak, stop: stopSpeech, isLoading: isSpeechLoading } = useTextToSpeech();
 
@@ -59,87 +61,85 @@ const CoursePlayer = () => {
     {
       id: 0,
       title: "Maya's Morning",
-      duration: 12,
+      duration: 15,
       description: "Maya wakes up feeling excited about her day",
       characters: [{ name: "Maya", emotion: "happy" as const, isActive: true }],
-      dialogue: "Good morning! I'm so excited about art class today. I can't wait to paint my favorite sunflower!",
+      dialogue: "Good morning! I'm so excited about art class today. I can't wait to paint my favorite sunflower! I've been thinking about all the bright yellow petals and the beautiful green stem.",
       speaker: "Maya",
       voiceId: "pFZP5JQG7iQjIQuC4Bku" // Lily voice - child-like
     },
     {
       id: 1,
       title: "The Spilled Paint",
-      duration: 15,
+      duration: 18,
       description: "Maya accidentally knocks over paint in art class",
       characters: [
         { name: "Maya", emotion: "worried" as const, isActive: true },
         { name: "Teacher", emotion: "empathetic" as const, isActive: false }
       ],
-      dialogue: "Oh no! My paintbrush slipped and red paint is everywhere! My beautiful sunflower painting is completely ruined.",
+      dialogue: "Oh no! My paintbrush slipped and red paint is everywhere! My beautiful sunflower painting is completely ruined. There's paint all over my desk and my hands too.",
       speaker: "Maya",
       voiceId: "pFZP5JQG7iQjIQuC4Bku" // Lily voice
     },
     {
       id: 2,
-      title: "Friends' Reactions",
-      duration: 20,
-      description: "Different friends respond to Maya's accident",
+      title: "Alex's Response",
+      duration: 12,
+      description: "Alex offers practical but not empathetic help",
       characters: [
         { name: "Maya", emotion: "sad" as const, isActive: false },
-        { name: "Alex", emotion: "surprised" as const, isActive: false },
-        { name: "Sam", emotion: "happy" as const, isActive: false },
-        { name: "Lily", emotion: "empathetic" as const, isActive: true }
+        { name: "Alex", emotion: "surprised" as const, isActive: true }
       ],
-      dialogue: "Hey Maya, accidents happen to everyone! Don't worry about it, just clean it up quickly.",
+      dialogue: "Hey Maya, don't worry about it! Accidents happen to everyone. Just grab some paper towels and clean it up quickly before it dries.",
       speaker: "Alex",
       voiceId: "CwhRBWXzGAHq8TQ4Fs17" // Roger voice - casual friend
     },
     {
       id: 3,
       title: "Sam's Response", 
-      duration: 8,
+      duration: 10,
       description: "Sam tries to lighten the mood",
       characters: [
         { name: "Maya", emotion: "sad" as const, isActive: false },
         { name: "Sam", emotion: "happy" as const, isActive: true }
       ],
-      dialogue: "Well, at least it's colorful now! It looks like abstract art. Maybe you started a new trend!",
+      dialogue: "Well, at least it's colorful now! It looks like abstract art. Maybe you just invented a new painting style!",
       speaker: "Sam",
       voiceId: "TX3LPaxmHKxFdv7VOQHJ" // Liam voice - upbeat
     },
     {
       id: 4,
       title: "Lily's Empathy",
-      duration: 10,
+      duration: 15,
       description: "Lily shows empathy and asks about Maya's feelings",
       characters: [
         { name: "Maya", emotion: "sad" as const, isActive: false },
         { name: "Lily", emotion: "empathetic" as const, isActive: true }
       ],
-      dialogue: "Maya, I can see you're really upset about this. How are you feeling right now? I'm here to listen.",
+      dialogue: "Maya, I can see you're really upset about this. I know you worked hard on that painting. How are you feeling right now? I'm here to listen to you.",
       speaker: "Lily",
       voiceId: "XrExE9yKIg1WjnnlVkGX" // Matilda voice - empathetic
     },
     {
       id: 5,
       title: "Maya's Feelings",
-      duration: 12,
+      duration: 18,
       description: "Maya expresses her emotions",
       characters: [{ name: "Maya", emotion: "sad" as const, isActive: true }],
-      dialogue: "I feel really frustrated and embarrassed. I worked so hard on that painting, and now everyone can see my mistake. I just wanted it to be perfect.",
+      dialogue: "I feel really frustrated and embarrassed. I worked so hard on that painting, and now everyone can see my mistake. I just wanted it to be perfect, and now it looks terrible.",
       speaker: "Maya",
       voiceId: "pFZP5JQG7iQjIQuC4Bku" // Lily voice
     },
     {
       id: 6,
       title: "Understanding & Support",
-      duration: 15,
+      duration: 20,
       description: "Lily provides support and understanding",
       characters: [
         { name: "Maya", emotion: "empathetic" as const, isActive: false },
         { name: "Lily", emotion: "happy" as const, isActive: true }
       ],
-      dialogue: "I understand you're upset, Maya. Your feelings are completely valid. You put your heart into that painting, and accidents like this are really disappointing. Would you like to paint another one together?",
+      dialogue: "I understand you're upset, Maya. Your feelings are completely valid and normal. You put your heart into that painting, and accidents like this are really disappointing. Would you like to paint another sunflower together? I think it would be even more beautiful.",
       speaker: "Lily",
       voiceId: "XrExE9yKIg1WjnnlVkGX" // Matilda voice
     }
@@ -147,35 +147,50 @@ const CoursePlayer = () => {
 
   const totalVideoDuration = videoScenes.reduce((total, scene) => total + scene.duration, 0);
 
-  // Auto-play dialogue when scene changes  
+  // Auto-play dialogue when scene changes with proper timing
   useEffect(() => {
-    if (isPlaying && !isMuted && currentScene < videoScenes.length) {
+    if (isPlaying && !isMuted && currentScene < videoScenes.length && !isSceneTransitioning) {
       const currentSceneData = videoScenes[currentScene];
       setCurrentSpeaker(currentSceneData.speaker);
+      setSpeechProgress(0);
       
-      // Add a small delay to let the scene render first
-      const timer = setTimeout(() => {
-        speak(currentSceneData.dialogue, { voiceId: currentSceneData.voiceId });
-      }, 500);
-      
-      return () => clearTimeout(timer);
+      // Start speech immediately when scene begins
+      speak(currentSceneData.dialogue, { 
+        voiceId: currentSceneData.voiceId,
+        model: "eleven_multilingual_v2" // Use higher quality model
+      });
     }
-  }, [currentScene, isPlaying, isMuted, speak]);
+  }, [currentScene, isPlaying, isMuted, speak, isSceneTransitioning]);
 
-  // Video progress and scene management
+  // Enhanced video progress and scene management with speech synchronization
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isPlaying && currentScene < videoScenes.length) {
       interval = setInterval(() => {
         setVideoProgress(prev => {
+          const currentSceneData = videoScenes[currentScene];
+          const sceneStartTime = videoScenes.slice(0, currentScene).reduce((sum, scene) => sum + scene.duration, 0);
+          const sceneProgress = ((prev / 100) * totalVideoDuration) - sceneStartTime;
+          const sceneProgressPercent = (sceneProgress / currentSceneData.duration) * 100;
+          
+          // Update speech progress indicator
+          setSpeechProgress(Math.min(sceneProgressPercent, 100));
+          
           const newProgress = prev + (100 / totalVideoDuration);
           const currentSceneEnd = (videoScenes.slice(0, currentScene + 1).reduce((sum, scene) => sum + scene.duration, 0) / totalVideoDuration) * 100;
           
           if (newProgress >= currentSceneEnd) {
             if (currentScene < videoScenes.length - 1) {
-              setCurrentScene(prev => prev + 1);
+              setIsSceneTransitioning(true);
+              // Small delay before transitioning to ensure speech can finish
+              setTimeout(() => {
+                setCurrentScene(prev => prev + 1);
+                setIsSceneTransitioning(false);
+              }, 500);
             } else {
               setIsPlaying(false);
+              setCurrentSpeaker(null);
+              setSpeechProgress(0);
             }
           }
           return Math.min(newProgress, 100);
@@ -189,15 +204,18 @@ const CoursePlayer = () => {
   const resetVideo = () => {
     setCurrentScene(0);
     setVideoProgress(0);
+    setSpeechProgress(0);
     setIsPlaying(false);
     setCurrentSpeaker(null);
+    setIsSceneTransitioning(false);
     stopSpeech();
   };
 
   const toggleMute = () => {
     setIsMuted(!isMuted);
-    if (isMuted) {
+    if (!isMuted) {
       stopSpeech();
+      setCurrentSpeaker(null);
     }
   };
 
@@ -232,10 +250,18 @@ const CoursePlayer = () => {
                     <Badge variant="secondary" className="text-xs">
                       Scene {currentScene + 1} of {videoScenes.length}
                     </Badge>
-                    {currentSpeaker && (
-                      <Badge variant="outline" className="text-xs bg-primary/20">
-                        🎤 {currentSpeaker}
-                      </Badge>
+                    {currentSpeaker && !isSceneTransitioning && (
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="text-xs bg-primary/20 border-primary/40">
+                          🎤 {currentSpeaker}
+                        </Badge>
+                        <div className="w-16 h-1 bg-white/20 rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-primary transition-all duration-300 ease-out" 
+                            style={{ width: `${speechProgress}%` }}
+                          />
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -429,17 +455,24 @@ const CoursePlayer = () => {
                 )}
               </div>
 
-              {/* Scene Dialogue */}
+              {/* Scene Dialogue with enhanced speech indicators */}
               <div className="p-4 bg-black/40 backdrop-blur-sm">
                 <div className="flex items-center justify-between">
                   <p className="text-white text-sm flex-1">{currentSceneData.dialogue}</p>
-                  {isSpeechLoading && (
-                    <div className="ml-4 flex space-x-1">
-                      <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                      <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                    </div>
-                  )}
+                  <div className="ml-4 flex items-center gap-2">
+                    {isSpeechLoading && (
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                        <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                      </div>
+                    )}
+                    {currentSpeaker && !isSceneTransitioning && (
+                      <div className="text-xs text-primary font-medium">
+                        Speaking...
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
