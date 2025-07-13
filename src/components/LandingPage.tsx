@@ -70,9 +70,9 @@ const LandingPage = () => {
       <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
         <div className="flex items-center space-x-3">
           <img 
-            src="/lovable-uploads/a2d7dbc7-31c2-4ab0-b71a-0574fb77d8bd.png" 
+            src="/lovable-uploads/06a3ec1d-2039-4b9a-bc9c-fb56fc8266d7.png" 
             alt="ENTETEYE Logo" 
-            className="w-20 h-20"
+            className="w-24 h-24"
           />
           <span className="text-2xl font-bold gradient-text">ENTETEYE</span>
         </div>
@@ -233,9 +233,9 @@ const LandingPage = () => {
         <div className="container mx-auto px-6 text-center text-muted-foreground">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <img 
-              src="/lovable-uploads/a2d7dbc7-31c2-4ab0-b71a-0574fb77d8bd.png" 
+              src="/lovable-uploads/06a3ec1d-2039-4b9a-bc9c-fb56fc8266d7.png" 
               alt="ENTETEYE Logo" 
-              className="w-16 h-16"
+              className="w-20 h-20"
             />
             <span className="text-xl font-bold gradient-text">ENTETEYE</span>
           </div>
