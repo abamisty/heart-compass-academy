@@ -68,11 +68,11 @@ const LandingPage = () => {
     <div className="min-h-screen bg-gradient-hero">
       {/* Navigation */}
       <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-3">
           <img 
             src="/lovable-uploads/a2d7dbc7-31c2-4ab0-b71a-0574fb77d8bd.png" 
             alt="ENTETEYE Logo" 
-            className="w-12 h-12"
+            className="w-16 h-16"
           />
           <span className="text-2xl font-bold gradient-text">ENTETEYE</span>
         </div>
@@ -235,7 +235,7 @@ const LandingPage = () => {
             <img 
               src="/lovable-uploads/a2d7dbc7-31c2-4ab0-b71a-0574fb77d8bd.png" 
               alt="ENTETEYE Logo" 
-              className="w-8 h-8"
+              className="w-12 h-12"
             />
             <span className="text-xl font-bold gradient-text">ENTETEYE</span>
           </div>
