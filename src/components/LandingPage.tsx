@@ -70,7 +70,7 @@ const LandingPage = () => {
       <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
         <div className="flex items-center space-x-2">
           <img 
-            src="/lovable-uploads/0808fce6-2776-43ae-81cb-53ee64767e2e.png" 
+            src="/lovable-uploads/a2d7dbc7-31c2-4ab0-b71a-0574fb77d8bd.png" 
             alt="ENTETEYE Logo" 
             className="w-12 h-12"
           />
@@ -233,7 +233,7 @@ const LandingPage = () => {
         <div className="container mx-auto px-6 text-center text-muted-foreground">
           <div className="flex items-center justify-center space-x-2 mb-4">
             <img 
-              src="/lovable-uploads/0808fce6-2776-43ae-81cb-53ee64767e2e.png" 
+              src="/lovable-uploads/a2d7dbc7-31c2-4ab0-b71a-0574fb77d8bd.png" 
               alt="ENTETEYE Logo" 
               className="w-8 h-8"
             />
