@@ -70,7 +70,7 @@ const LandingPage = () => {
       {/* Navigation */}
       <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
         <div className="flex items-center space-x-3">
-          <img src={penguinLogo} alt="ENTETEYE Academy Logo" className="w-24 h-24" />
+          <img src={penguinLogo} alt="ENTETEYE Academy Logo" className="w-32 h-32" />
           <span className="text-2xl font-bold gradient-text">ENTETEYE ACADEMY</span>
         </div>
         <div className="space-x-4">
@@ -229,7 +229,7 @@ const LandingPage = () => {
       <footer className="border-t border-border/50 py-8">
         <div className="container mx-auto px-6 text-center text-muted-foreground">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <img src={penguinLogo} alt="ENTETEYE Academy Logo" className="w-20 h-20" />
+            <img src={penguinLogo} alt="ENTETEYE Academy Logo" className="w-28 h-28" />
             <span className="text-xl font-bold gradient-text">ENTETEYE ACADEMY</span>
           </div>
           <p>© 2024 ENTETEYE ACADEMY. Building character, shaping futures.</p>
