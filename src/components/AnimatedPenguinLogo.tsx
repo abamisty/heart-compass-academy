@@ -28,8 +28,22 @@ export const AnimatedPenguinLogo: React.FC<AnimatedPenguinLogoProps> = ({ classN
       <ellipse cx="100" cy="75" rx="25" ry="28" fill="#B8E6E8" />
       
       {/* Mother Penguin Eyes */}
-      <circle cx="88" cy="65" r="8" fill="white" />
-      <circle cx="112" cy="65" r="8" fill="white" />
+      <circle cx="88" cy="65" r="8" fill="white">
+        <animate
+          attributeName="ry"
+          values="8; 1; 8"
+          dur="3s"
+          repeatCount="indefinite"
+        />
+      </circle>
+      <circle cx="112" cy="65" r="8" fill="white">
+        <animate
+          attributeName="ry"
+          values="8; 1; 8"
+          dur="3s"
+          repeatCount="indefinite"
+        />
+      </circle>
       
       {/* Animated Eye Pupils */}
       <circle cx="88" cy="65" r="4" fill="black">
@@ -80,6 +94,26 @@ export const AnimatedPenguinLogo: React.FC<AnimatedPenguinLogoProps> = ({ classN
       
       {/* Baby Penguin Body */}
       <ellipse cx="65" cy="155" rx="22" ry="30" fill="#F5F5DC" />
+      
+      {/* Baby Penguin Wings */}
+      <ellipse cx="50" cy="150" rx="8" ry="15" fill="#E6E6B8" transform="rotate(-15 50 150)">
+        <animateTransform
+          attributeName="transform"
+          type="rotate"
+          values="-15 50 150; -30 50 150; -15 50 150; 0 50 150; -15 50 150"
+          dur="1.5s"
+          repeatCount="indefinite"
+        />
+      </ellipse>
+      <ellipse cx="80" cy="150" rx="8" ry="15" fill="#E6E6B8" transform="rotate(15 80 150)">
+        <animateTransform
+          attributeName="transform"
+          type="rotate"
+          values="15 80 150; 30 80 150; 15 80 150; 0 80 150; 15 80 150"
+          dur="1.5s"
+          repeatCount="indefinite"
+        />
+      </ellipse>
       
       {/* Baby Penguin Head */}
       <circle cx="65" cy="135" r="18" fill="#F5F5DC" />
