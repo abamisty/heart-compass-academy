@@ -74,7 +74,7 @@ const LandingPage = () => {
             alt="ENTETEYE Logo" 
             className="w-40 h-40"
           />
-          <span className="text-2xl font-bold gradient-text">ENTETEYE</span>
+          <span className="text-2xl font-bold gradient-text">ENTETEYE ACADEMY</span>
         </div>
         <div className="space-x-4">
           <Link to="/login">
@@ -237,9 +237,9 @@ const LandingPage = () => {
               alt="ENTETEYE Logo" 
               className="w-32 h-32"
             />
-            <span className="text-xl font-bold gradient-text">ENTETEYE</span>
+            <span className="text-xl font-bold gradient-text">ENTETEYE ACADEMY</span>
           </div>
-          <p>© 2024 ENTETEYE. Building character, shaping futures.</p>
+          <p>© 2024 ENTETEYE ACADEMY. Building character, shaping futures.</p>
         </div>
       </footer>
     </div>
