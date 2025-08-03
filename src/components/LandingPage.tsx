@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Heart, Star, Trophy, Users, BookOpen, Target, Zap, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
-// Remove penguin logo import
+import mascotLogo from "/mascot.svg";
 import heroImage from "@/assets/hero-image.jpg";
 
 const LandingPage = () => {
@@ -70,7 +70,7 @@ const LandingPage = () => {
       {/* Navigation */}
       <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
         <div className="flex items-center space-x-3">
-          <img src="/lovable-uploads/d22bb001-ba14-45cf-acc7-169be9e0eb3d.png" alt="ENTETEYE Academy Logo" className="w-32 h-32" />
+          <img src={mascotLogo} alt="ENTETEYE Academy Logo" className="w-32 h-32" />
           <span className="text-2xl font-bold gradient-text">ENTETEYE ACADEMY</span>
         </div>
         <div className="space-x-4">
@@ -229,7 +229,7 @@ const LandingPage = () => {
       <footer className="border-t border-border/50 py-8">
         <div className="container mx-auto px-6 text-center text-muted-foreground">
           <div className="flex items-center justify-center space-x-2 mb-4">
-            <img src="/lovable-uploads/d22bb001-ba14-45cf-acc7-169be9e0eb3d.png" alt="ENTETEYE Academy Logo" className="w-28 h-28" />
+            <img src={mascotLogo} alt="ENTETEYE Academy Logo" className="w-28 h-28" />
             <span className="text-xl font-bold gradient-text">ENTETEYE ACADEMY</span>
           </div>
           <p>© 2024 ENTETEYE ACADEMY. Building character, shaping futures.</p>
