@@ -1,0 +1,87 @@
+/* Penguin Logo Animations */
+.penguin-logo {
+  animation: gentle-float 4s ease-in-out infinite;
+}
+
+.parent-penguin {
+  transform-origin: center bottom;
+  animation: parent-sway 3s ease-in-out infinite;
+}
+
+.baby-penguin {
+  transform-origin: center bottom;
+  animation: baby-bounce 2s ease-in-out infinite;
+}
+
+.penguin-eyes {
+  animation: blink 4s ease-in-out infinite;
+}
+
+.penguin-wings {
+  transform-origin: center;
+  animation: wing-flap 2.5s ease-in-out infinite;
+}
+
+@keyframes gentle-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes parent-sway {
+  0%, 100% {
+    transform: rotate(0deg) translateX(0px);
+  }
+  25% {
+    transform: rotate(0.5deg) translateX(1px);
+  }
+  75% {
+    transform: rotate(-0.5deg) translateX(-1px);
+  }
+}
+
+@keyframes baby-bounce {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateY(-2px) scale(1.02);
+  }
+}
+
+@keyframes blink {
+  0%, 95%, 100% {
+    opacity: 1;
+  }
+  97.5% {
+    opacity: 0.1;
+  }
+}
+
+@keyframes wing-flap {
+  0%, 100% {
+    transform: rotateZ(0deg);
+  }
+  25% {
+    transform: rotateZ(2deg);
+  }
+  75% {
+    transform: rotateZ(-2deg);
+  }
+}
+
+/* Hover effects for enhanced interaction */
+.penguin-logo:hover .parent-penguin {
+  animation-duration: 1.5s;
+}
+
+.penguin-logo:hover .baby-penguin {
+  animation-duration: 1s;
+}
+
+.penguin-logo:hover .penguin-wings {
+  animation-duration: 1s;
+}
