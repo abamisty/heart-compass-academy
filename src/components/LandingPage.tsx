@@ -157,7 +157,7 @@ const LandingPage = () => {
         
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {features.map((feature, index) => (
-            <Card key={index} className="card-hover border-0 bg-white/80 backdrop-blur-sm">
+            <Card key={index} className="card-hover border-0 bg-background/80 backdrop-blur-sm">
               <CardHeader className="text-center">
                 <div className={`mx-auto mb-4 ${feature.color}`}>
                   {feature.icon}
@@ -185,7 +185,7 @@ const LandingPage = () => {
         
         <div className="grid md:grid-cols-3 gap-8">
           {ageGroups.map((group, index) => (
-            <Card key={index} className="card-hover border-0 bg-gradient-to-br from-white via-white to-primary/5">
+            <Card key={index} className="card-hover border-0 bg-gradient-to-br from-background via-background to-primary/5">
               <CardHeader>
                 <CardTitle className="text-xl text-primary">{group.title}</CardTitle>
                 <CardDescription className="text-base">{group.description}</CardDescription>
@@ -217,7 +217,7 @@ const LandingPage = () => {
                 <Heart className="w-5 h-5 mr-2" />
                 Start 14-Day Free Trial
               </Button>
-              <Button variant="outline" size="xl" className="border-white text-white hover:bg-white hover:text-primary">
+              <Button variant="outline" size="xl" className="border-primary/20 text-white hover:bg-background/20 hover:text-primary">
                 Schedule Demo
               </Button>
             </div>
