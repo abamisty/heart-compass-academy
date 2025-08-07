@@ -17,13 +17,13 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    /* Primary Brand Colors - Vibrant Green (from logo) */
-    --primary: 142 76% 36%;
+    /* Primary Brand Colors - Dark Blue */
+    --primary: 217 100% 35%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 142 76% 50%;
+    --primary-glow: 217 100% 50%;
 
-    /* Secondary Colors - Royal Blue (from logo) */
-    --secondary: 213 94% 68%;
+    /* Secondary Colors - Light Blue */
+    --secondary: 213 100% 65%;
     --secondary-foreground: 0 0% 100%;
 
     /* Accent Colors - Bright Green */
