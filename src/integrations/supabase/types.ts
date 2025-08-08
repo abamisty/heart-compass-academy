@@ -44,6 +44,50 @@ export type Database = {
         }
         Relationships: []
       }
+      checkpoints: {
+        Row: {
+          checkpoint_type: string
+          created_at: string | null
+          description: string | null
+          id: string
+          order_index: number
+          rewards: Json | null
+          title: string
+          unit_id: string
+          unlock_requirements: Json
+        }
+        Insert: {
+          checkpoint_type?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          order_index: number
+          rewards?: Json | null
+          title: string
+          unit_id: string
+          unlock_requirements?: Json
+        }
+        Update: {
+          checkpoint_type?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          order_index?: number
+          rewards?: Json | null
+          title?: string
+          unit_id?: string
+          unlock_requirements?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "checkpoints_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       courses: {
         Row: {
           age_group: Database["public"]["Enums"]["age_group"]
@@ -183,6 +227,78 @@ export type Database = {
             columns: ["enrolled_by"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      exercises: {
+        Row: {
+          audio_transcript: string | null
+          correct_answer: string
+          created_at: string | null
+          crown_level: number
+          difficulty_score: number | null
+          exercise_type: Database["public"]["Enums"]["exercise_type"]
+          feedback_correct: string
+          feedback_incorrect: string
+          hint_text: string | null
+          id: string
+          image_desc: string | null
+          lesson_id: string | null
+          options: Json | null
+          prompt_text: string
+          skill_id: string
+          xp_reward: number
+        }
+        Insert: {
+          audio_transcript?: string | null
+          correct_answer: string
+          created_at?: string | null
+          crown_level?: number
+          difficulty_score?: number | null
+          exercise_type: Database["public"]["Enums"]["exercise_type"]
+          feedback_correct: string
+          feedback_incorrect: string
+          hint_text?: string | null
+          id?: string
+          image_desc?: string | null
+          lesson_id?: string | null
+          options?: Json | null
+          prompt_text: string
+          skill_id: string
+          xp_reward?: number
+        }
+        Update: {
+          audio_transcript?: string | null
+          correct_answer?: string
+          created_at?: string | null
+          crown_level?: number
+          difficulty_score?: number | null
+          exercise_type?: Database["public"]["Enums"]["exercise_type"]
+          feedback_correct?: string
+          feedback_incorrect?: string
+          hint_text?: string | null
+          id?: string
+          image_desc?: string | null
+          lesson_id?: string | null
+          options?: Json | null
+          prompt_text?: string
+          skill_id?: string
+          xp_reward?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exercises_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "exercises_skill_id_fkey"
+            columns: ["skill_id"]
+            isOneToOne: false
+            referencedRelation: "skills"
             referencedColumns: ["id"]
           },
         ]
@@ -371,6 +487,119 @@ export type Database = {
           },
         ]
       }
+      review_queue: {
+        Row: {
+          child_id: string
+          completed_at: string | null
+          created_at: string | null
+          due_date: string
+          ease_factor: number
+          id: string
+          interval_days: number
+          next_review_date: string | null
+          priority: number
+          repetition_count: number
+          review_type: Database["public"]["Enums"]["review_type"]
+          skill_id: string
+          unit_id: string | null
+        }
+        Insert: {
+          child_id: string
+          completed_at?: string | null
+          created_at?: string | null
+          due_date: string
+          ease_factor?: number
+          id?: string
+          interval_days?: number
+          next_review_date?: string | null
+          priority?: number
+          repetition_count?: number
+          review_type: Database["public"]["Enums"]["review_type"]
+          skill_id: string
+          unit_id?: string | null
+        }
+        Update: {
+          child_id?: string
+          completed_at?: string | null
+          created_at?: string | null
+          due_date?: string
+          ease_factor?: number
+          id?: string
+          interval_days?: number
+          next_review_date?: string | null
+          priority?: number
+          repetition_count?: number
+          review_type?: Database["public"]["Enums"]["review_type"]
+          skill_id?: string
+          unit_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "review_queue_skill_id_fkey"
+            columns: ["skill_id"]
+            isOneToOne: false
+            referencedRelation: "skills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "review_queue_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      skills: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          icon: string
+          id: string
+          max_crown_level: number
+          order_index: number
+          prerequisite_skills: string[] | null
+          title: string
+          unit_id: string
+          updated_at: string | null
+          xp_per_crown: number
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          icon?: string
+          id?: string
+          max_crown_level?: number
+          order_index: number
+          prerequisite_skills?: string[] | null
+          title: string
+          unit_id: string
+          updated_at?: string | null
+          xp_per_crown?: number
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          icon?: string
+          id?: string
+          max_crown_level?: number
+          order_index?: number
+          prerequisite_skills?: string[] | null
+          title?: string
+          unit_id?: string
+          updated_at?: string | null
+          xp_per_crown?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "skills_unit_id_fkey"
+            columns: ["unit_id"]
+            isOneToOne: false
+            referencedRelation: "units"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       streaks: {
         Row: {
           child_id: string
@@ -402,6 +631,47 @@ export type Database = {
             columns: ["child_id"]
             isOneToOne: true
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      units: {
+        Row: {
+          course_id: string
+          created_at: string | null
+          description: string | null
+          id: string
+          order_index: number
+          title: string
+          unlock_requirements: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          course_id: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          order_index: number
+          title: string
+          unlock_requirements?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          course_id?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          order_index?: number
+          title?: string
+          unlock_requirements?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "units_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
             referencedColumns: ["id"]
           },
         ]
@@ -442,11 +712,179 @@ export type Database = {
           },
         ]
       }
+      user_checkpoint_progress: {
+        Row: {
+          checkpoint_id: string
+          child_id: string
+          completed: boolean
+          completed_at: string | null
+          created_at: string | null
+          id: string
+          unlocked: boolean
+          unlocked_at: string | null
+        }
+        Insert: {
+          checkpoint_id: string
+          child_id: string
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          unlocked?: boolean
+          unlocked_at?: string | null
+        }
+        Update: {
+          checkpoint_id?: string
+          child_id?: string
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string | null
+          id?: string
+          unlocked?: boolean
+          unlocked_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_checkpoint_progress_checkpoint_id_fkey"
+            columns: ["checkpoint_id"]
+            isOneToOne: false
+            referencedRelation: "checkpoints"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_exercise_history: {
+        Row: {
+          attempts: number | null
+          child_id: string
+          correct: boolean
+          created_at: string | null
+          difficulty_at_time: number | null
+          exercise_id: string
+          hints_used: number | null
+          id: string
+          response: string | null
+          session_id: string | null
+          skill_id: string
+          time_taken_seconds: number | null
+          xp_awarded: number
+        }
+        Insert: {
+          attempts?: number | null
+          child_id: string
+          correct: boolean
+          created_at?: string | null
+          difficulty_at_time?: number | null
+          exercise_id: string
+          hints_used?: number | null
+          id?: string
+          response?: string | null
+          session_id?: string | null
+          skill_id: string
+          time_taken_seconds?: number | null
+          xp_awarded?: number
+        }
+        Update: {
+          attempts?: number | null
+          child_id?: string
+          correct?: boolean
+          created_at?: string | null
+          difficulty_at_time?: number | null
+          exercise_id?: string
+          hints_used?: number | null
+          id?: string
+          response?: string | null
+          session_id?: string | null
+          skill_id?: string
+          time_taken_seconds?: number | null
+          xp_awarded?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_exercise_history_exercise_id_fkey"
+            columns: ["exercise_id"]
+            isOneToOne: false
+            referencedRelation: "exercises"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_exercise_history_skill_id_fkey"
+            columns: ["skill_id"]
+            isOneToOne: false
+            referencedRelation: "skills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_skill_progress: {
+        Row: {
+          best_streak: number
+          child_id: string
+          created_at: string | null
+          crown_level: number
+          current_streak: number
+          id: string
+          last_practice_date: string | null
+          mastery_score: number | null
+          skill_id: string
+          state: Database["public"]["Enums"]["skill_state"]
+          total_xp: number
+          updated_at: string | null
+        }
+        Insert: {
+          best_streak?: number
+          child_id: string
+          created_at?: string | null
+          crown_level?: number
+          current_streak?: number
+          id?: string
+          last_practice_date?: string | null
+          mastery_score?: number | null
+          skill_id: string
+          state?: Database["public"]["Enums"]["skill_state"]
+          total_xp?: number
+          updated_at?: string | null
+        }
+        Update: {
+          best_streak?: number
+          child_id?: string
+          created_at?: string | null
+          crown_level?: number
+          current_streak?: number
+          id?: string
+          last_practice_date?: string | null
+          mastery_score?: number | null
+          skill_id?: string
+          state?: Database["public"]["Enums"]["skill_state"]
+          total_xp?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_skill_progress_skill_id_fkey"
+            columns: ["skill_id"]
+            isOneToOne: false
+            referencedRelation: "skills"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      calculate_next_review_interval: {
+        Args: {
+          current_interval: number
+          ease_factor: number
+          performance_quality: number
+        }
+        Returns: {
+          next_interval: number
+          new_ease_factor: number
+        }[]
+      }
       get_user_profile_id: {
         Args: { user_uuid: string }
         Returns: string
@@ -459,9 +897,36 @@ export type Database = {
         Args: { profile_id: string }
         Returns: boolean
       }
+      schedule_skill_review: {
+        Args: {
+          p_child_id: string
+          p_skill_id: string
+          p_performance_quality: number
+        }
+        Returns: undefined
+      }
+      schedule_unit_review_after_crown: {
+        Args: { p_child_id: string; p_skill_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       age_group: "foundational" | "growth" | "purpose"
+      exercise_type:
+        | "multiple_choice_audio"
+        | "picture_choice"
+        | "true_false"
+        | "fill_blank"
+        | "reorder_words"
+        | "speak_prompt"
+        | "scenario_response"
+        | "match_image_text"
+      review_type:
+        | "skill_practice"
+        | "unit_review"
+        | "spaced_repetition"
+        | "remedial"
+      skill_state: "locked" | "unlocked" | "completed" | "mastered"
       user_role: "parent" | "child"
     }
     CompositeTypes: {
@@ -591,6 +1056,23 @@ export const Constants = {
   public: {
     Enums: {
       age_group: ["foundational", "growth", "purpose"],
+      exercise_type: [
+        "multiple_choice_audio",
+        "picture_choice",
+        "true_false",
+        "fill_blank",
+        "reorder_words",
+        "speak_prompt",
+        "scenario_response",
+        "match_image_text",
+      ],
+      review_type: [
+        "skill_practice",
+        "unit_review",
+        "spaced_repetition",
+        "remedial",
+      ],
+      skill_state: ["locked", "unlocked", "completed", "mastered"],
       user_role: ["parent", "child"],
     },
   },
