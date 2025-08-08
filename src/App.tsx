@@ -13,6 +13,7 @@ import ChildLoginPage from "./components/auth/ChildLoginPage";
 import ParentDashboard from "./components/ParentDashboard";
 import ChildDashboard from "./components/ChildDashboard";
 import CoursePlayer from "./components/CoursePlayer";
+import CurriculumPreview from "./components/CurriculumPreview";
 
 const queryClient = new QueryClient();
 
@@ -45,6 +46,7 @@ const App = () => (
               } 
             />
             <Route path="/course-player" element={<CoursePlayer />} />
+            <Route path="/curriculum-preview" element={<CurriculumPreview />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
