@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2, Sparkles, Crown, Target, Zap, Volume2, Eye, MessageSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import InteractiveExercise from "./InteractiveExercise";
 
 interface Exercise {
   exerciseId: string;
@@ -219,99 +220,32 @@ const ExerciseGenerator = () => {
 
       {/* Generated Exercises */}
       {generatedExercises.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Target className="h-5 w-5" />
-              Generated Exercises
-            </CardTitle>
-            <CardDescription>
-              {skillId && skillOptions[skillId as keyof typeof skillOptions]} - Crown Level {crownLevel}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-6">
-              {generatedExercises.map((exercise, index) => (
-                <Card key={exercise.exerciseId} className="border-l-4 border-l-primary">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded-lg ${getExerciseTypeColor(exercise.type)} text-white`}>
-                          {getExerciseTypeIcon(exercise.type)}
-                        </div>
-                        <div>
-                          <CardTitle className="text-lg">Exercise {index + 1}</CardTitle>
-                          <div className="flex items-center gap-2 mt-1">
-                            <Badge variant="secondary">{exercise.type}</Badge>
-                            <Badge variant="outline">{exercise.xpReward} XP</Badge>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div>
-                      <h4 className="font-medium text-sm text-muted-foreground mb-1">Prompt</h4>
-                      <p className="text-sm">{exercise.promptText}</p>
-                    </div>
-
-                    {exercise.options && (
-                      <div>
-                        <h4 className="font-medium text-sm text-muted-foreground mb-2">Options</h4>
-                        <div className="grid grid-cols-2 gap-2">
-                          {exercise.options.map((option, optionIndex) => (
-                            <div 
-                              key={optionIndex}
-                              className={`p-2 rounded border text-sm ${
-                                optionIndex === 0 
-                                  ? 'bg-green-50 border-green-200 text-green-800' 
-                                  : 'bg-gray-50 border-gray-200'
-                              }`}
-                            >
-                              {optionIndex === 0 ? '✓ ' : ''}{option}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {exercise.imageDesc && (
-                      <div>
-                        <h4 className="font-medium text-sm text-muted-foreground mb-1">Image Description</h4>
-                        <p className="text-sm bg-blue-50 p-2 rounded border">{exercise.imageDesc}</p>
-                      </div>
-                    )}
-
-                    {exercise.audioTranscript && (
-                      <div>
-                        <h4 className="font-medium text-sm text-muted-foreground mb-1">Audio Transcript</h4>
-                        <p className="text-sm bg-orange-50 p-2 rounded border">{exercise.audioTranscript}</p>
-                      </div>
-                    )}
-
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <h4 className="font-medium text-sm text-muted-foreground mb-1">Hint</h4>
-                        <p className="text-sm bg-yellow-50 p-2 rounded border">{exercise.hintText}</p>
-                      </div>
-                      <div>
-                        <h4 className="font-medium text-sm text-muted-foreground mb-1">Feedback</h4>
-                        <div className="space-y-1">
-                          <p className="text-xs bg-green-50 p-2 rounded border text-green-800">
-                            ✓ {exercise.feedbackCorrect}
-                          </p>
-                          <p className="text-xs bg-red-50 p-2 rounded border text-red-800">
-                            ✗ {exercise.feedbackIncorrect}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Target className="h-5 w-5" />
+                Interactive Exercises
+              </CardTitle>
+              <CardDescription>
+                {skillId && skillOptions[skillId as keyof typeof skillOptions]} - Crown Level {crownLevel}
+              </CardDescription>
+            </CardHeader>
+          </Card>
+          
+          <div className="grid gap-6">
+            {generatedExercises.map((exercise, index) => (
+              <InteractiveExercise
+                key={exercise.exerciseId}
+                exercise={exercise}
+                onComplete={(correct, xp) => {
+                  // Handle completion - could save to database, update progress, etc.
+                  console.log(`Exercise ${index + 1} completed:`, { correct, xp });
+                }}
+              />
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );
