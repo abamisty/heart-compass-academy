@@ -14,6 +14,7 @@ import ParentDashboard from "./components/ParentDashboard";
 import ChildDashboard from "./components/ChildDashboard";
 import CoursePlayer from "./components/CoursePlayer";
 import CurriculumPreview from "./components/CurriculumPreview";
+import ExerciseGenerator from "./components/ExerciseGenerator";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,7 @@ const App = () => (
             />
             <Route path="/course-player" element={<CoursePlayer />} />
             <Route path="/curriculum-preview" element={<CurriculumPreview />} />
+            <Route path="/exercise-generator" element={<ExerciseGenerator />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

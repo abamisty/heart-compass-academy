@@ -1,0 +1,2 @@
+-- Create edge function for generating curriculum exercises
+-- This will be handled by the edge function creation below

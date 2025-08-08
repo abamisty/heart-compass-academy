@@ -2,7 +2,9 @@ import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Heart, Users, UserCheck, Target, Globe, Crown, Star, CheckCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Heart, Users, UserCheck, Target, Globe, Crown, Star, CheckCircle, Sparkles } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const CurriculumPreview = () => {
   const units = [
@@ -84,6 +86,14 @@ const CurriculumPreview = () => {
           <Badge variant="secondary" className="text-sm">18 Skills</Badge>
           <Badge variant="secondary" className="text-sm">125 Lessons</Badge>
           <Badge variant="secondary" className="text-sm">5 Crown Levels Each</Badge>
+        </div>
+        <div className="mt-4">
+          <Link to="/exercise-generator">
+            <Button variant="glow" size="lg">
+              <Sparkles className="w-5 h-5 mr-2" />
+              Try Exercise Generator
+            </Button>
+          </Link>
         </div>
       </div>
 
