@@ -29,9 +29,9 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: 'gpt-image-1',
-        prompt: `${prompt}. Flat illustration style, bright colors, child-friendly, educational, 512x512 icon`,
+        prompt: `${prompt}. Flat illustration style, bright colors, child-friendly, educational`,
         n: 1,
-        size: '512x512',
+        size: '1024x1024',
         quality: 'auto',
         output_format: 'png'
       }),
