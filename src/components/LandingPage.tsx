@@ -133,6 +133,12 @@ const LandingPage = () => {
                   Course Player Demo
                 </Button>
               </Link>
+              <Link to="/curriculum-preview">
+                <Button variant="glow" size="lg">
+                  <Star className="w-5 h-5 mr-2" />
+                  View Curriculum Preview
+                </Button>
+              </Link>
             </div>
           </div>
           
