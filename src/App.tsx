@@ -21,6 +21,7 @@ import { AdminAnalytics } from "./components/admin/AdminAnalytics";
 import { AdminUsers } from "./components/admin/AdminUsers";
 import { AdminContent } from "./components/admin/AdminContent";
 import { AdminSafety } from "./components/admin/AdminSafety";
+import { AdminCourseGenerator } from "./components/admin/AdminCourseGenerator";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +64,7 @@ const App = () => (
               <Route path="users" element={<AdminUsers />} />
               <Route path="content" element={<AdminContent />} />
               <Route path="safety" element={<AdminSafety />} />
+              <Route path="course-generator" element={<AdminCourseGenerator />} />
             </Route>
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

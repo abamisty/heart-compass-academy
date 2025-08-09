@@ -10,6 +10,7 @@ import {
   MessageSquare,
   TrendingUp,
   AlertTriangle,
+  Wand2,
 } from "lucide-react";
 import {
   Sidebar,
@@ -53,6 +54,12 @@ const adminMenuItems = [
     title: "Curriculum",
     url: "/admin/curriculum",
     icon: Database,
+    group: "Management"
+  },
+  {
+    title: "Course Generator",
+    url: "/admin/course-generator",
+    icon: Wand2,
     group: "Management"
   },
   {
