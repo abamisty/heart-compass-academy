@@ -26,12 +26,19 @@ const Index = () => {
   return (
     <div>
       <LandingPage />
-      <div className="fixed bottom-4 right-4">
+      <div className="fixed bottom-4 right-4 flex flex-col gap-2">
         <Button 
           onClick={() => setShowPreview(true)}
           className="shadow-lg"
         >
           🎯 Preview Lesson
+        </Button>
+        <Button 
+          variant="outline"
+          onClick={() => window.location.href = '/admin'}
+          className="shadow-lg"
+        >
+          ⚙️ Admin Dashboard
         </Button>
       </div>
     </div>
