@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import { 
   Plus, 
   Trash2, 
@@ -99,6 +101,7 @@ export function AdminCourseGenerator() {
   const [selectedUnit, setSelectedUnit] = useState<string>('');
   const [selectedSkill, setSelectedSkill] = useState<string>('');
   const [previewMode, setPreviewMode] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const exerciseTypes = [
     { value: 'multiple_choice', label: 'Multiple Choice', icon: '🔘' },
@@ -195,8 +198,17 @@ export function AdminCourseGenerator() {
   };
 
   const generateCourseStructure = async () => {
-    // Mock AI course generation - in real app would call AI service
-    const generatedUnits: Unit[] = [
+    if (!currentCourse.title || !currentCourse.description) {
+      toast.error("Please fill in course title and description first");
+      return;
+    }
+
+    setIsGenerating(true);
+    toast.info("Generating course structure...");
+    
+    try {
+      // Create comprehensive course structure
+      const generatedUnits: Unit[] = [
       {
         id: 'unit-love-basics',
         title: 'Love & Care Basics',
@@ -276,11 +288,91 @@ export function AdminCourseGenerator() {
       }
     ];
 
-    setCurrentCourse(prev => ({
-      ...prev,
-      units: generatedUnits,
-      checkpoints: generatedCheckpoints
-    }));
+      setCurrentCourse(prev => ({
+        ...prev,
+        units: generatedUnits,
+        checkpoints: generatedCheckpoints
+      }));
+      
+      toast.success("Course structure generated successfully!");
+    } catch (error) {
+      console.error("Error generating course:", error);
+      toast.error("Failed to generate course structure");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const generateExercises = async () => {
+    if (currentCourse.units.length === 0) {
+      toast.error("Please create some units and skills first");
+      return;
+    }
+
+    setIsGenerating(true);
+    toast.info("Generating exercises for course...");
+
+    try {
+      const updatedUnits = [...currentCourse.units];
+      
+      for (const unit of updatedUnits) {
+        for (const skill of unit.skills) {
+          if (skill.lessons.length === 0) {
+            // Add a default lesson if none exists
+            skill.lessons.push({
+              id: `lesson-${Date.now()}-${Math.random()}`,
+              title: `${skill.title} Practice`,
+              description: `Practice exercises for ${skill.title}`,
+              order: 0,
+              exercises: [],
+              heartGemsReward: 25
+            });
+          }
+          
+          for (const lesson of skill.lessons) {
+            if (lesson.exercises.length === 0) {
+              // Generate exercises using AI
+              const { data, error } = await supabase.functions.invoke('generate-exercises', {
+                body: {
+                  topic: skill.title,
+                  skillDescription: skill.description,
+                  ageGroup: currentCourse.ageGroup,
+                  difficulty: currentCourse.difficulty,
+                  exerciseCount: 5
+                }
+              });
+
+              if (error) {
+                console.error("Error generating exercises:", error);
+                continue;
+              }
+
+              if (data?.exercises) {
+                lesson.exercises = data.exercises.map((ex: any, index: number) => ({
+                  id: `ex-${Date.now()}-${index}`,
+                  type: ex.type || 'multiple_choice',
+                  prompt: ex.prompt || ex.question,
+                  difficulty: 1.0,
+                  xpReward: 10
+                }));
+              }
+            }
+          }
+        }
+      }
+
+      setCurrentCourse(prev => ({
+        ...prev,
+        units: updatedUnits
+      }));
+
+      toast.success("Exercises generated successfully!");
+    } catch (error) {
+      console.error("Error generating exercises:", error);
+      toast.error("Failed to generate exercises");
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const LearningPathPreview = () => (
@@ -378,9 +470,9 @@ export function AdminCourseGenerator() {
             <Eye className="w-4 h-4 mr-2" />
             {previewMode ? 'Edit Mode' : 'Preview Path'}
           </Button>
-          <Button onClick={generateCourseStructure}>
+          <Button onClick={generateCourseStructure} disabled={isGenerating}>
             <Zap className="w-4 h-4 mr-2" />
-            AI Generate Course
+            {isGenerating ? "Generating..." : "AI Generate Course"}
           </Button>
           <Button>
             <Save className="w-4 h-4 mr-2" />
@@ -647,13 +739,13 @@ export function AdminCourseGenerator() {
                     Use AI to automatically generate lesson content and exercises for your course structure
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-md mx-auto">
-                    <Button variant="outline" onClick={generateCourseStructure}>
+                    <Button variant="outline" onClick={generateCourseStructure} disabled={isGenerating}>
                       <BookOpen className="w-4 h-4 mr-2" />
-                      Generate Full Course
+                      {isGenerating ? "Generating..." : "Generate Full Course"}
                     </Button>
-                    <Button variant="outline">
+                    <Button variant="outline" onClick={generateExercises} disabled={isGenerating}>
                       <Target className="w-4 h-4 mr-2" />
-                      Generate Exercises
+                      {isGenerating ? "Generating..." : "Generate Exercises"}
                     </Button>
                   </div>
                 </div>
