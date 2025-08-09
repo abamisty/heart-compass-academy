@@ -1,113 +1,68 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BookOpen, Clock, Users, Star, Search, Filter } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface Course {
   id: string;
   title: string;
   description: string;
-  ageGroup: string;
-  duration: string;
+  age_group: string;
+  duration_weeks: number;
   difficulty: string;
-  category: string;
-  rating: number;
-  enrolled: number;
-  imageUrl?: string;
+  total_lessons: number;
+  is_featured: boolean;
+  image_url?: string;
+  created_at: string;
 }
 
 interface CourseSelectionGridProps {
   selectedChild: any;
-  onCourseEnroll: (courseId: string, childId: number) => void;
+  onCourseEnroll: (courseId: string, childId: string) => void;
 }
 
 export const CourseSelectionGrid = ({ selectedChild, onCourseEnroll }: CourseSelectionGridProps) => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("all");
   const [difficultyFilter, setDifficultyFilter] = useState("all");
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const courses: Course[] = [
-    {
-      id: "1",
-      title: "Character Values Foundations",
-      description: "Learn core values like honesty, kindness, and respect through interactive stories and activities",
-      ageGroup: "6-10",
-      duration: "4 weeks",
-      difficulty: "Beginner",
-      category: "Character Building",
-      rating: 4.8,
-      enrolled: 1250
-    },
-    {
-      id: "2",
-      title: "Financial Literacy & Sales Skills",
-      description: "Understand money management and develop basic entrepreneurial skills",
-      ageGroup: "11-15",
-      duration: "6 weeks",
-      difficulty: "Intermediate",
-      category: "Life Skills",
-      rating: 4.6,
-      enrolled: 890
-    },
-    {
-      id: "3",
-      title: "Public Speaking Confidence",
-      description: "Build confidence in expressing ideas and opinions through guided practice",
-      ageGroup: "13-18",
-      duration: "8 weeks",
-      difficulty: "Advanced",
-      category: "Communication",
-      rating: 4.9,
-      enrolled: 670
-    },
-    {
-      id: "4",
-      title: "Digital Citizenship",
-      description: "Navigate online relationships and digital responsibility safely",
-      ageGroup: "10-16",
-      duration: "4 weeks",
-      difficulty: "Beginner",
-      category: "Digital Skills",
-      rating: 4.7,
-      enrolled: 1100
-    },
-    {
-      id: "5",
-      title: "Emotional Intelligence Mastery",
-      description: "Advanced emotional awareness and management skills for better relationships",
-      ageGroup: "14-18",
-      duration: "10 weeks",
-      difficulty: "Advanced",
-      category: "Character Building",
-      rating: 4.8,
-      enrolled: 450
-    },
-    {
-      id: "6",
-      title: "Creative Problem Solving",
-      description: "Develop innovative thinking and solution-finding abilities",
-      ageGroup: "8-14",
-      duration: "5 weeks",
-      difficulty: "Intermediate",
-      category: "Critical Thinking",
-      rating: 4.5,
-      enrolled: 780
-    }
-  ];
-
-  const categories = ["all", "Character Building", "Life Skills", "Communication", "Digital Skills", "Critical Thinking"];
   const difficulties = ["all", "Beginner", "Intermediate", "Advanced"];
+
+  useEffect(() => {
+    fetchCourses();
+  }, []);
+
+  const fetchCourses = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('courses')
+        .select('*')
+        .order('created_at', { ascending: true });
+
+      if (error) throw error;
+
+      setCourses(data || []);
+    } catch (error) {
+      console.error('Error fetching courses:', error);
+      toast.error('Failed to load courses');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredCourses = courses.filter(course => {
     const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          course.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = categoryFilter === "all" || course.category === categoryFilter;
     const matchesDifficulty = difficultyFilter === "all" || course.difficulty === difficultyFilter;
     
-    return matchesSearch && matchesCategory && matchesDifficulty;
+    return matchesSearch && matchesDifficulty;
   });
 
   const getDifficultyColor = (difficulty: string) => {
@@ -118,6 +73,14 @@ export const CourseSelectionGrid = ({ selectedChild, onCourseEnroll }: CourseSel
       default: return "bg-gray-100 text-gray-800";
     }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -132,20 +95,6 @@ export const CourseSelectionGrid = ({ selectedChild, onCourseEnroll }: CourseSel
             className="pl-10"
           />
         </div>
-        
-        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-          <SelectTrigger className="w-full sm:w-[200px]">
-            <Filter className="w-4 h-4 mr-2" />
-            <SelectValue placeholder="Category" />
-          </SelectTrigger>
-          <SelectContent>
-            {categories.map(category => (
-              <SelectItem key={category} value={category}>
-                {category === "all" ? "All Categories" : category}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
         
         <Select value={difficultyFilter} onValueChange={setDifficultyFilter}>
           <SelectTrigger className="w-full sm:w-[150px]">
@@ -168,10 +117,11 @@ export const CourseSelectionGrid = ({ selectedChild, onCourseEnroll }: CourseSel
             <CardHeader>
               <div className="flex items-start justify-between">
                 <BookOpen className="w-8 h-8 text-primary mb-2" />
-                <div className="flex items-center gap-1">
-                  <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                  <span className="text-sm font-medium">{course.rating}</span>
-                </div>
+                {course.is_featured && (
+                  <Badge variant="default" className="bg-yellow-500">
+                    Featured
+                  </Badge>
+                )}
               </div>
               <CardTitle className="text-lg group-hover:text-primary transition-colors">
                 {course.title}
@@ -182,8 +132,8 @@ export const CourseSelectionGrid = ({ selectedChild, onCourseEnroll }: CourseSel
             <CardContent>
               <div className="space-y-4">
                 <div className="flex flex-wrap gap-2">
-                  <Badge variant="secondary">Ages {course.ageGroup}</Badge>
-                  <Badge variant="outline">{course.duration}</Badge>
+                  <Badge variant="secondary">Ages {course.age_group}</Badge>
+                  <Badge variant="outline">{course.duration_weeks} weeks</Badge>
                   <Badge className={getDifficultyColor(course.difficulty)}>
                     {course.difficulty}
                   </Badge>
@@ -192,11 +142,11 @@ export const CourseSelectionGrid = ({ selectedChild, onCourseEnroll }: CourseSel
                 <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <div className="flex items-center gap-1">
                     <Clock className="w-4 h-4" />
-                    {course.duration}
+                    {course.duration_weeks} weeks
                   </div>
                   <div className="flex items-center gap-1">
-                    <Users className="w-4 h-4" />
-                    {course.enrolled} enrolled
+                    <BookOpen className="w-4 h-4" />
+                    {course.total_lessons} lessons
                   </div>
                 </div>
                 

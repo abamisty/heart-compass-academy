@@ -22,19 +22,21 @@ import {
 
 // Import new components
 import { CourseSelectionGrid } from "@/components/parent/CourseSelectionGrid";
-import { LearningPathProgress } from "@/components/parent/LearningPathProgress";
+import { DuolingoStyleLearningPath } from "@/components/DuolingoStyleLearningPath";
 import { ProgressReports } from "@/components/parent/ProgressReports";
 import { AchievementTracking } from "@/components/parent/AchievementTracking";
 import { ParentControls } from "@/components/parent/ParentControls";
 import ChildProfileManagement from "@/components/parent/ChildProfileManagement";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const ParentDashboard = () => {
   const [selectedChild, setSelectedChild] = useState(0);
   const [isAddingChild, setIsAddingChild] = useState(false);
   const [children, setChildren] = useState([
     {
-      id: 1,
+      id: "child-1",
       name: "Emma",
       age: 12,
       avatar: "/placeholder-avatar.png",
@@ -47,7 +49,7 @@ const ParentDashboard = () => {
       weeklyTime: 4.5
     },
     {
-      id: 2,
+      id: "child-2",
       name: "Alex",
       age: 15,
       avatar: "/placeholder-avatar.png",
@@ -62,6 +64,7 @@ const ParentDashboard = () => {
   ]);
   
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const currentChild = children[selectedChild];
 
@@ -70,11 +73,29 @@ const ParentDashboard = () => {
     setChildren(prev => [...prev, newChild]);
   };
 
-  const handleCourseEnroll = (courseId: string, childId: number) => {
-    toast({
-      title: "Course Enrolled",
-      description: `Successfully enrolled ${currentChild.name} in the selected course.`
-    });
+  const handleCourseEnroll = async (courseId: string, childId: string) => {
+    try {
+      const { error } = await supabase
+        .from('enrollments')
+        .insert({
+          child_id: childId,
+          course_id: courseId,
+          enrolled_by: user?.id
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Course Enrolled",
+        description: `Successfully enrolled ${currentChild.name} in the selected course.`
+      });
+    } catch (error) {
+      console.error('Error enrolling in course:', error);
+      toast({
+        title: "Error",
+        description: "Failed to enroll in course"
+      });
+    }
   };
 
   const handleSettingsUpdate = (settings: any) => {
@@ -319,7 +340,7 @@ const ParentDashboard = () => {
           </TabsContent>
 
           <TabsContent value="learning-path" className="space-y-6">
-            <LearningPathProgress selectedChild={currentChild} />
+            <DuolingoStyleLearningPath selectedChild={currentChild} />
           </TabsContent>
 
           <TabsContent value="reports" className="space-y-6">
