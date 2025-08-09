@@ -15,6 +15,12 @@ import ChildDashboard from "./components/ChildDashboard";
 import CoursePlayer from "./components/CoursePlayer";
 import CurriculumPreview from "./components/CurriculumPreview";
 import ExerciseGenerator from "./components/ExerciseGenerator";
+import { AdminLayout } from "./components/admin/AdminLayout";
+import { AdminOverview } from "./components/admin/AdminOverview";
+import { AdminAnalytics } from "./components/admin/AdminAnalytics";
+import { AdminUsers } from "./components/admin/AdminUsers";
+import { AdminContent } from "./components/admin/AdminContent";
+import { AdminSafety } from "./components/admin/AdminSafety";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +55,16 @@ const App = () => (
             <Route path="/course-player" element={<CoursePlayer />} />
             <Route path="/curriculum-preview" element={<CurriculumPreview />} />
             <Route path="/exercise-generator" element={<ExerciseGenerator />} />
+            
+            {/* Admin Routes */}
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminOverview />} />
+              <Route path="analytics" element={<AdminAnalytics />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="content" element={<AdminContent />} />
+              <Route path="safety" element={<AdminSafety />} />
+            </Route>
+            
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
