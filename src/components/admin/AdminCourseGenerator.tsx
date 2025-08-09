@@ -616,14 +616,60 @@ export function AdminCourseGenerator() {
                                           <Crown key={i} className="w-3 h-3 text-yellow-500" />
                                         ))}
                                       </div>
-                                      <Button variant="ghost" size="sm" onClick={() => addLesson(skill.id)}>
-                                        <Plus className="w-3 h-3 mr-1" />
-                                        Lesson
-                                      </Button>
-                                    </div>
-                                    <Badge variant="outline" className="mt-2">
-                                      {skill.lessons.length} lessons
-                                    </Badge>
+                                       <div className="flex gap-1">
+                                         <Button variant="ghost" size="sm" onClick={() => addLesson(skill.id)}>
+                                           <Plus className="w-3 h-3 mr-1" />
+                                           Lesson
+                                         </Button>
+                                         <Button 
+                                           variant="ghost" 
+                                           size="sm" 
+                                           onClick={() => setSelectedSkill(selectedSkill === skill.id ? '' : skill.id)}
+                                         >
+                                           <Eye className="w-3 h-3 mr-1" />
+                                           View Exercises
+                                         </Button>
+                                       </div>
+                                     </div>
+                                     <Badge variant="outline" className="mt-2">
+                                       {skill.lessons.length} lessons • {skill.lessons.reduce((total, lesson) => total + lesson.exercises.length, 0)} exercises
+                                     </Badge>
+                                     
+                                     {/* Expandable Exercises View */}
+                                     {selectedSkill === skill.id && (
+                                       <div className="mt-3 p-3 bg-muted rounded-lg space-y-2">
+                                         <div className="text-sm font-medium">Lessons & Exercises:</div>
+                                         {skill.lessons.length === 0 ? (
+                                           <div className="text-xs text-muted-foreground">No lessons yet</div>
+                                         ) : (
+                                           skill.lessons.map((lesson, lessonIndex) => (
+                                             <div key={lesson.id} className="bg-background p-2 rounded">
+                                               <div className="text-xs font-medium mb-1">{lesson.title}</div>
+                                               {lesson.exercises.length === 0 ? (
+                                                 <div className="text-xs text-muted-foreground">No exercises yet - click "Generate Exercises" to add some</div>
+                                               ) : (
+                                                 <div className="space-y-1">
+                                                   {lesson.exercises.map((exercise, exerciseIndex) => (
+                                                     <div key={exercise.id} className="text-xs p-2 bg-muted/50 rounded">
+                                                       <div className="flex items-center gap-2 mb-1">
+                                                         <Badge variant="secondary" className="text-xs">
+                                                           {exerciseTypes.find(t => t.value === exercise.type)?.icon} 
+                                                           {exerciseTypes.find(t => t.value === exercise.type)?.label}
+                                                         </Badge>
+                                                         <span className="text-xs text-muted-foreground">
+                                                           {exercise.xpReward} XP
+                                                         </span>
+                                                       </div>
+                                                       <div className="text-xs">{exercise.prompt}</div>
+                                                     </div>
+                                                   ))}
+                                                 </div>
+                                               )}
+                                             </div>
+                                           ))
+                                         )}
+                                       </div>
+                                     )}
                                   </CardContent>
                                 </Card>
                               ))}
