@@ -32,9 +32,10 @@ interface ChildProfile {
 interface ChildProfileManagementProps {
   isAddingChild?: boolean;
   setIsAddingChild?: (value: boolean) => void;
+  onChildAdded?: () => void;
 }
 
-const ChildProfileManagement = ({ isAddingChild: externalIsAddingChild, setIsAddingChild: externalSetIsAddingChild }: ChildProfileManagementProps = {}) => {
+const ChildProfileManagement = ({ isAddingChild: externalIsAddingChild, setIsAddingChild: externalSetIsAddingChild, onChildAdded }: ChildProfileManagementProps = {}) => {
   const { toast } = useToast();
   const { user } = useAuth();
   const [children, setChildren] = useState<ChildProfile[]>([]);
@@ -224,6 +225,7 @@ const ChildProfileManagement = ({ isAddingChild: externalIsAddingChild, setIsAdd
       setIsAddingChild(false);
       resetForm();
       loadChildren();
+      onChildAdded?.(); // Notify parent component
     } catch (error: any) {
       console.error("Full error details:", error);
       let errorMessage = error.message;
