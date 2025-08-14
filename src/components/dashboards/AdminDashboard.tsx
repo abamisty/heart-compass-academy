@@ -74,6 +74,40 @@ const AdminDashboard: React.FC = () => {
     branch: ''
   });
 
+  // Created content storage
+  const [createdModules, setCreatedModules] = useState([
+    {
+      id: '1',
+      title: 'Digital Citizenship with Pax',
+      description: 'Learn responsible online behavior and digital ethics',
+      ageGroup: '13-15',
+      character: 'pax',
+      branch: 'character-building',
+      status: 'published',
+      createdAt: '2024-01-15'
+    },
+    {
+      id: '2',
+      title: 'Family Budget Planning with Leo',
+      description: 'Practical money management and family budgeting skills',
+      ageGroup: '16-18',
+      character: 'leo',
+      branch: 'practical-skills',
+      status: 'draft',
+      createdAt: '2024-01-14'
+    }
+  ]);
+
+  const [createdPrompts, setCreatedPrompts] = useState([
+    {
+      id: '1',
+      moduleTitle: 'Digital Citizenship',
+      prompts: ['How do you handle cyberbullying?', 'What are privacy settings?'],
+      parentGuidance: 'Discuss real online experiences',
+      createdAt: '2024-01-15'
+    }
+  ]);
+
   // Mock admin data
   const adminStats = {
     totalFamilies: 1247,
@@ -147,6 +181,16 @@ const AdminDashboard: React.FC = () => {
       return;
     }
     
+    const newPrompt = {
+      id: Date.now().toString(),
+      moduleTitle: curriculumForm.moduleTitle,
+      prompts: curriculumForm.discussionPrompts.split('\n').filter(p => p.trim()),
+      parentGuidance: curriculumForm.parentGuidance,
+      createdAt: new Date().toISOString().split('T')[0]
+    };
+    
+    setCreatedPrompts(prev => [newPrompt, ...prev]);
+    
     setRecentActivity(prev => [{
       id: Date.now().toString(),
       action: `Discussion prompts created for "${curriculumForm.moduleTitle}"`,
@@ -202,6 +246,15 @@ const AdminDashboard: React.FC = () => {
       });
       return;
     }
+    
+    const newModuleData = {
+      id: Date.now().toString(),
+      ...newModule,
+      status: 'draft',
+      createdAt: new Date().toISOString().split('T')[0]
+    };
+    
+    setCreatedModules(prev => [newModuleData, ...prev]);
     
     setRecentActivity(prev => [{
       id: Date.now().toString(),
@@ -390,6 +443,49 @@ const AdminDashboard: React.FC = () => {
               </CardContent>
             </Card>
 
+            {/* Created Modules List */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Created Modules ({createdModules.length})</CardTitle>
+                <CardDescription>
+                  All learning modules created in the system
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {createdModules.map((module) => (
+                    <div key={module.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex items-center space-x-4">
+                        <CharacterAvatar 
+                          characterId={module.character} 
+                          size="sm"
+                        />
+                        <div>
+                          <h4 className="font-medium">{module.title}</h4>
+                          <p className="text-sm text-muted-foreground">{module.description}</p>
+                          <div className="flex items-center space-x-2 mt-1">
+                            <Badge variant="outline">{module.ageGroup}</Badge>
+                            <Badge variant="outline">{module.branch}</Badge>
+                            <Badge variant={module.status === 'published' ? 'default' : 'secondary'}>
+                              {module.status}
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button variant="outline" size="sm">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
             <div className="grid gap-6 md:grid-cols-2">
               {/* Age Band Customization */}
               <Card>
@@ -516,6 +612,55 @@ const AdminDashboard: React.FC = () => {
                   <Save className="h-4 w-4 mr-2" />
                   Save Prompts
                 </Button>
+              </CardContent>
+            </Card>
+
+            {/* Created Discussion Prompts */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Discussion Prompts Library ({createdPrompts.length})</CardTitle>
+                <CardDescription>
+                  All discussion prompts created for family conversations
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {createdPrompts.map((prompt) => (
+                    <div key={prompt.id} className="p-4 border rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <h4 className="font-medium">{prompt.moduleTitle}</h4>
+                        <div className="flex space-x-2">
+                          <Button variant="outline" size="sm">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button variant="outline" size="sm">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <div>
+                          <label className="text-sm font-medium text-muted-foreground">Discussion Questions:</label>
+                          <ul className="text-sm mt-1 space-y-1">
+                            {prompt.prompts.map((p, index) => (
+                              <li key={index} className="flex items-start">
+                                <span className="mr-2">•</span>
+                                <span>{p}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        {prompt.parentGuidance && (
+                          <div>
+                            <label className="text-sm font-medium text-muted-foreground">Parent Guidance:</label>
+                            <p className="text-sm mt-1">{prompt.parentGuidance}</p>
+                          </div>
+                        )}
+                        <p className="text-xs text-muted-foreground">Created: {prompt.createdAt}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
