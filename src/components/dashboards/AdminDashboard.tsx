@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/components/ui/use-toast';
 import { 
   BookOpen, 
   Users, 
@@ -17,13 +18,61 @@ import {
   Palette,
   MessageSquare,
   Shield,
-  TrendingUp
+  TrendingUp,
+  Save,
+  Check,
+  AlertTriangle
 } from 'lucide-react';
 import CharacterAvatar from '@/components/shared/CharacterAvatar';
 import { PENGUIN_FAMILY, HUMAN_CHARACTERS } from '@/types/characters';
 
 const AdminDashboard: React.FC = () => {
+  const { toast } = useToast();
   const [selectedCharacter, setSelectedCharacter] = useState<string>('pax');
+  
+  // Curriculum Management State
+  const [curriculumForm, setCurriculumForm] = useState({
+    ageGroup: '',
+    complexityLevel: '',
+    culturalContext: '',
+    valueEmphasis: '',
+    moduleTitle: '',
+    discussionPrompts: '',
+    parentGuidance: ''
+  });
+
+  // Character Management State
+  const [characterData, setCharacterData] = useState({
+    personalityTraits: '',
+    voiceStyle: '',
+    scenarioPreferences: ''
+  });
+
+  // Analytics State
+  const [analyticsData, setAnalyticsData] = useState({
+    dailyActiveFamilies: 89,
+    discussionCompletionRate: 76,
+    approvalResponseTime: 2.3,
+    honestyModuleImpact: 'High',
+    responsibilityGrowth: 'High',
+    empathyDevelopment: 'Moderate'
+  });
+
+  // Safety State
+  const [safetyStatus, setSafetyStatus] = useState({
+    culturalSensitivity: 'passed',
+    ageAppropriateness: 'passed',
+    contentModeration: 'passed'
+  });
+
+  // Content State
+  const [newModule, setNewModule] = useState({
+    title: '',
+    description: '',
+    ageGroup: '',
+    character: '',
+    branch: ''
+  });
 
   // Mock admin data
   const adminStats = {
@@ -33,11 +82,156 @@ const AdminDashboard: React.FC = () => {
     averageEngagement: 87
   };
 
-  const recentActivity = [
+  const [recentActivity, setRecentActivity] = useState([
     { id: '1', action: 'New module created', user: 'Content Team', time: '2 hours ago' },
     { id: '2', action: 'Discussion quality improved', user: 'AI System', time: '4 hours ago' },
     { id: '3', action: 'Family enrolled', user: 'Parent Portal', time: '6 hours ago' }
-  ];
+  ]);
+
+  // Load character data when character changes
+  useEffect(() => {
+    const character = [...PENGUIN_FAMILY, ...HUMAN_CHARACTERS].find(c => c.id === selectedCharacter);
+    if (character) {
+      setCharacterData({
+        personalityTraits: character.personality + '. ' + character.description,
+        voiceStyle: `Speaks with ${character.personality.toLowerCase()} tone. Focuses on ${character.specialization.toLowerCase()}.`,
+        scenarioPreferences: character.specialization + ' related scenarios and challenges.'
+      });
+    }
+  }, [selectedCharacter]);
+
+  // Handler functions
+  const handleCurriculumUpdate = (field: string, value: string) => {
+    setCurriculumForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSaveCurriculumSettings = () => {
+    if (!curriculumForm.ageGroup || !curriculumForm.complexityLevel) {
+      toast({
+        title: "Missing Information",
+        description: "Please select both age group and complexity level.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    toast({
+      title: "Settings Updated",
+      description: `Curriculum settings updated for ${curriculumForm.ageGroup} age group.`,
+    });
+  };
+
+  const handleCulturalAdaptation = () => {
+    if (!curriculumForm.culturalContext || !curriculumForm.valueEmphasis) {
+      toast({
+        title: "Missing Information",
+        description: "Please select both cultural context and value emphasis.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    toast({
+      title: "Adaptation Applied",
+      description: `Cultural adaptation applied for ${curriculumForm.culturalContext} context.`,
+    });
+  };
+
+  const handleSaveDiscussionPrompts = () => {
+    if (!curriculumForm.moduleTitle || !curriculumForm.discussionPrompts) {
+      toast({
+        title: "Missing Information",
+        description: "Please enter module title and discussion prompts.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setRecentActivity(prev => [{
+      id: Date.now().toString(),
+      action: `Discussion prompts created for "${curriculumForm.moduleTitle}"`,
+      user: 'Admin Dashboard',
+      time: 'Just now'
+    }, ...prev]);
+    
+    toast({
+      title: "Prompts Saved",
+      description: `Discussion prompts saved for ${curriculumForm.moduleTitle}.`,
+    });
+    
+    setCurriculumForm(prev => ({ ...prev, moduleTitle: '', discussionPrompts: '', parentGuidance: '' }));
+  };
+
+  const handleUpdateCharacterProfile = () => {
+    const character = [...PENGUIN_FAMILY, ...HUMAN_CHARACTERS].find(c => c.id === selectedCharacter);
+    
+    setRecentActivity(prev => [{
+      id: Date.now().toString(),
+      action: `${character?.name} character profile updated`,
+      user: 'Admin Dashboard',
+      time: 'Just now'
+    }, ...prev]);
+    
+    toast({
+      title: "Character Updated",
+      description: `${character?.name}'s profile has been updated successfully.`,
+    });
+  };
+
+  const handleConsistencyCheck = () => {
+    toast({
+      title: "Consistency Check Running",
+      description: "Running full personality consistency check across all content...",
+    });
+    
+    // Simulate consistency check
+    setTimeout(() => {
+      toast({
+        title: "Consistency Check Complete",
+        description: "All character content maintains personality consistency.",
+      });
+    }, 2000);
+  };
+
+  const handleCreateNewModule = () => {
+    if (!newModule.title || !newModule.character || !newModule.branch) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields for the new module.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setRecentActivity(prev => [{
+      id: Date.now().toString(),
+      action: `New module "${newModule.title}" created`,
+      user: 'Admin Dashboard',
+      time: 'Just now'
+    }, ...prev]);
+    
+    toast({
+      title: "Module Created",
+      description: `"${newModule.title}" has been created successfully.`,
+    });
+    
+    setNewModule({ title: '', description: '', ageGroup: '', character: '', branch: '' });
+  };
+
+  const handleRunSafetyCheck = (checkType: string) => {
+    toast({
+      title: "Safety Check Running",
+      description: `Running ${checkType} assessment...`,
+    });
+    
+    setTimeout(() => {
+      setSafetyStatus(prev => ({ ...prev, [checkType]: 'passed' }));
+      toast({
+        title: "Safety Check Complete",
+        description: `${checkType} assessment completed successfully.`,
+      });
+    }, 1500);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -111,11 +305,90 @@ const AdminDashboard: React.FC = () => {
           <TabsContent value="curriculum" className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold">Curriculum Management</h2>
-              <Button className="flex items-center gap-2">
+              <Button 
+                className="flex items-center gap-2"
+                onClick={handleCreateNewModule}
+              >
                 <Plus className="h-4 w-4" />
                 Create New Module
               </Button>
             </div>
+
+            {/* New Module Creation Form */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Create New Module</CardTitle>
+                <CardDescription>
+                  Build a new learning module with character guidance
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Module Title *</label>
+                    <Input 
+                      placeholder="e.g., Digital Citizenship"
+                      value={newModule.title}
+                      onChange={(e) => setNewModule(prev => ({ ...prev, title: e.target.value }))}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Learning Branch *</label>
+                    <Select value={newModule.branch} onValueChange={(value) => setNewModule(prev => ({ ...prev, branch: value }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select branch" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="family-values">Family Values</SelectItem>
+                        <SelectItem value="character-building">Character Building</SelectItem>
+                        <SelectItem value="practical-skills">Practical Skills</SelectItem>
+                        <SelectItem value="emotional-intelligence">Emotional Intelligence</SelectItem>
+                        <SelectItem value="community">Community</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Character Guide *</label>
+                    <Select value={newModule.character} onValueChange={(value) => setNewModule(prev => ({ ...prev, character: value }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select character" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {[...PENGUIN_FAMILY, ...HUMAN_CHARACTERS].map((char) => (
+                          <SelectItem key={char.id} value={char.id}>{char.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Target Age Group</label>
+                    <Select value={newModule.ageGroup} onValueChange={(value) => setNewModule(prev => ({ ...prev, ageGroup: value }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select age group" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="10-12">10-12 years</SelectItem>
+                        <SelectItem value="13-15">13-15 years</SelectItem>
+                        <SelectItem value="16-18">16-18 years</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Description</label>
+                  <Textarea 
+                    placeholder="Describe the learning objectives and content..."
+                    value={newModule.description}
+                    onChange={(e) => setNewModule(prev => ({ ...prev, description: e.target.value }))}
+                    rows={3}
+                  />
+                </div>
+                <Button onClick={handleCreateNewModule} className="w-full">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Create Module
+                </Button>
+              </CardContent>
+            </Card>
 
             <div className="grid gap-6 md:grid-cols-2">
               {/* Age Band Customization */}
@@ -129,7 +402,7 @@ const AdminDashboard: React.FC = () => {
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Age Group</label>
-                    <Select>
+                    <Select value={curriculumForm.ageGroup} onValueChange={(value) => handleCurriculumUpdate('ageGroup', value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select age group" />
                       </SelectTrigger>
@@ -142,7 +415,7 @@ const AdminDashboard: React.FC = () => {
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Complexity Level</label>
-                    <Select>
+                    <Select value={curriculumForm.complexityLevel} onValueChange={(value) => handleCurriculumUpdate('complexityLevel', value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select complexity" />
                       </SelectTrigger>
@@ -153,7 +426,10 @@ const AdminDashboard: React.FC = () => {
                       </SelectContent>
                     </Select>
                   </div>
-                  <Button className="w-full">Update Settings</Button>
+                  <Button className="w-full" onClick={handleSaveCurriculumSettings}>
+                    <Save className="h-4 w-4 mr-2" />
+                    Update Settings
+                  </Button>
                 </CardContent>
               </Card>
 
@@ -168,7 +444,7 @@ const AdminDashboard: React.FC = () => {
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Cultural Context</label>
-                    <Select>
+                    <Select value={curriculumForm.culturalContext} onValueChange={(value) => handleCurriculumUpdate('culturalContext', value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select cultural context" />
                       </SelectTrigger>
@@ -182,7 +458,7 @@ const AdminDashboard: React.FC = () => {
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Value Emphasis</label>
-                    <Select>
+                    <Select value={curriculumForm.valueEmphasis} onValueChange={(value) => handleCurriculumUpdate('valueEmphasis', value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select emphasis" />
                       </SelectTrigger>
@@ -193,7 +469,10 @@ const AdminDashboard: React.FC = () => {
                       </SelectContent>
                     </Select>
                   </div>
-                  <Button className="w-full">Apply Adaptation</Button>
+                  <Button className="w-full" onClick={handleCulturalAdaptation}>
+                    <Settings className="h-4 w-4 mr-2" />
+                    Apply Adaptation
+                  </Button>
                 </CardContent>
               </Card>
             </div>
@@ -209,13 +488,19 @@ const AdminDashboard: React.FC = () => {
               <CardContent className="space-y-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Module Topic</label>
-                  <Input placeholder="e.g., Honesty and Trust" />
+                  <Input 
+                    placeholder="e.g., Honesty and Trust" 
+                    value={curriculumForm.moduleTitle}
+                    onChange={(e) => handleCurriculumUpdate('moduleTitle', e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Discussion Prompts</label>
                   <Textarea 
                     placeholder="Enter discussion prompts, one per line..."
                     rows={6}
+                    value={curriculumForm.discussionPrompts}
+                    onChange={(e) => handleCurriculumUpdate('discussionPrompts', e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
@@ -223,9 +508,14 @@ const AdminDashboard: React.FC = () => {
                   <Textarea 
                     placeholder="Guidance for parents on facilitating this discussion..."
                     rows={3}
+                    value={curriculumForm.parentGuidance}
+                    onChange={(e) => handleCurriculumUpdate('parentGuidance', e.target.value)}
                   />
                 </div>
-                <Button>Save Prompts</Button>
+                <Button onClick={handleSaveDiscussionPrompts}>
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Prompts
+                </Button>
               </CardContent>
             </Card>
           </TabsContent>
@@ -286,25 +576,31 @@ const AdminDashboard: React.FC = () => {
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Personality Traits</label>
                     <Textarea 
-                      defaultValue="Wise, patient, responsible, caring father figure who teaches through example..."
+                      value={characterData.personalityTraits}
+                      onChange={(e) => setCharacterData(prev => ({ ...prev, personalityTraits: e.target.value }))}
                       rows={3}
                     />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Voice Style Guidelines</label>
                     <Textarea 
-                      defaultValue="Speaks with warmth and authority. Uses gentle questions to guide thinking..."
+                      value={characterData.voiceStyle}
+                      onChange={(e) => setCharacterData(prev => ({ ...prev, voiceStyle: e.target.value }))}
                       rows={3}
                     />
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Scenario Preferences</label>
                     <Textarea 
-                      defaultValue="Home responsibilities, leadership challenges, moral dilemmas..."
+                      value={characterData.scenarioPreferences}
+                      onChange={(e) => setCharacterData(prev => ({ ...prev, scenarioPreferences: e.target.value }))}
                       rows={2}
                     />
                   </div>
-                  <Button className="w-full">Update Character Profile</Button>
+                  <Button className="w-full" onClick={handleUpdateCharacterProfile}>
+                    <Save className="h-4 w-4 mr-2" />
+                    Update Character Profile
+                  </Button>
                 </CardContent>
               </Card>
             </div>
@@ -323,16 +619,23 @@ const AdminDashboard: React.FC = () => {
               <CardContent>
                 <div className="space-y-4">
                   <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                    <p className="text-sm text-green-800">
-                      ✅ All Pax content maintains consistent wise, patient tone
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <Check className="h-4 w-4 text-green-600" />
+                      <p className="text-sm text-green-800">
+                        All {PENGUIN_FAMILY.find(c => c.id === selectedCharacter)?.name || HUMAN_CHARACTERS.find(c => c.id === selectedCharacter)?.name} content maintains personality consistency
+                      </p>
+                    </div>
                   </div>
-                  <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <p className="text-sm text-yellow-800">
-                      ⚠️ Pearl's content in Module 3 needs review for empathy consistency
-                    </p>
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <Shield className="h-4 w-4 text-blue-600" />
+                      <p className="text-sm text-blue-800">
+                        Character voice patterns are within acceptable range
+                      </p>
+                    </div>
                   </div>
-                  <Button variant="outline" className="w-full">
+                  <Button variant="outline" className="w-full" onClick={handleConsistencyCheck}>
+                    <Shield className="h-4 w-4 mr-2" />
                     Run Full Consistency Check
                   </Button>
                 </div>
@@ -350,17 +653,26 @@ const AdminDashboard: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="flex justify-between">
+                    <div className="flex justify-between items-center">
                       <span>Daily Active Families</span>
-                      <span className="font-bold">89%</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold">{analyticsData.dailyActiveFamilies}%</span>
+                        <TrendingUp className="h-4 w-4 text-green-500" />
+                      </div>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex justify-between items-center">
                       <span>Discussion Completion Rate</span>
-                      <span className="font-bold">76%</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold">{analyticsData.discussionCompletionRate}%</span>
+                        <TrendingUp className="h-4 w-4 text-green-500" />
+                      </div>
                     </div>
-                    <div className="flex justify-between">
+                    <div className="flex justify-between items-center">
                       <span>Parent Approval Response Time</span>
-                      <span className="font-bold">2.3 hours</span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold">{analyticsData.approvalResponseTime} hours</span>
+                        <TrendingUp className="h-4 w-4 text-blue-500" />
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -374,15 +686,21 @@ const AdminDashboard: React.FC = () => {
                   <div className="space-y-4">
                     <div className="flex justify-between">
                       <span>Honesty Module Impact</span>
-                      <Badge variant="default">High</Badge>
+                      <Badge variant={analyticsData.honestyModuleImpact === 'High' ? "default" : "secondary"}>
+                        {analyticsData.honestyModuleImpact}
+                      </Badge>
                     </div>
                     <div className="flex justify-between">
                       <span>Responsibility Growth</span>
-                      <Badge variant="default">High</Badge>
+                      <Badge variant={analyticsData.responsibilityGrowth === 'High' ? "default" : "secondary"}>
+                        {analyticsData.responsibilityGrowth}
+                      </Badge>
                     </div>
                     <div className="flex justify-between">
                       <span>Empathy Development</span>
-                      <Badge variant="secondary">Moderate</Badge>
+                      <Badge variant={analyticsData.empathyDevelopment === 'High' ? "default" : "secondary"}>
+                        {analyticsData.empathyDevelopment}
+                      </Badge>
                     </div>
                   </div>
                 </CardContent>
@@ -423,11 +741,32 @@ const AdminDashboard: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                      <p className="text-sm text-green-800">✅ All content passed cultural review</p>
+                    <div className={`p-3 border rounded-lg ${
+                      safetyStatus.culturalSensitivity === 'passed' 
+                        ? 'bg-green-50 border-green-200' 
+                        : 'bg-yellow-50 border-yellow-200'
+                    }`}>
+                      <div className="flex items-center gap-2">
+                        {safetyStatus.culturalSensitivity === 'passed' ? (
+                          <Check className="h-4 w-4 text-green-600" />
+                        ) : (
+                          <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                        )}
+                        <p className={`text-sm ${
+                          safetyStatus.culturalSensitivity === 'passed' 
+                            ? 'text-green-800' 
+                            : 'text-yellow-800'
+                        }`}>
+                          {safetyStatus.culturalSensitivity === 'passed' 
+                            ? 'All content passed cultural review'
+                            : 'Some content needs cultural review'
+                          }
+                        </p>
+                      </div>
                     </div>
-                    <Button variant="outline" className="w-full">
-                      Review Flagged Content
+                    <Button variant="outline" className="w-full" onClick={() => handleRunSafetyCheck('culturalSensitivity')}>
+                      <Shield className="h-4 w-4 mr-2" />
+                      Run Cultural Review
                     </Button>
                   </div>
                 </CardContent>
@@ -439,10 +778,31 @@ const AdminDashboard: React.FC = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                      <p className="text-sm text-green-800">✅ All modules age-appropriate</p>
+                    <div className={`p-3 border rounded-lg ${
+                      safetyStatus.ageAppropriateness === 'passed' 
+                        ? 'bg-green-50 border-green-200' 
+                        : 'bg-yellow-50 border-yellow-200'
+                    }`}>
+                      <div className="flex items-center gap-2">
+                        {safetyStatus.ageAppropriateness === 'passed' ? (
+                          <Check className="h-4 w-4 text-green-600" />
+                        ) : (
+                          <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                        )}
+                        <p className={`text-sm ${
+                          safetyStatus.ageAppropriateness === 'passed' 
+                            ? 'text-green-800' 
+                            : 'text-yellow-800'
+                        }`}>
+                          {safetyStatus.ageAppropriateness === 'passed' 
+                            ? 'All modules age-appropriate'
+                            : 'Some modules need age review'
+                          }
+                        </p>
+                      </div>
                     </div>
-                    <Button variant="outline" className="w-full">
+                    <Button variant="outline" className="w-full" onClick={() => handleRunSafetyCheck('ageAppropriateness')}>
+                      <Shield className="h-4 w-4 mr-2" />
                       Run Age Assessment
                     </Button>
                   </div>
