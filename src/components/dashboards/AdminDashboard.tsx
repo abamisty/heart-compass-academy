@@ -6,6 +6,8 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/components/ui/use-toast';
 import { 
   BookOpen, 
@@ -21,10 +23,23 @@ import {
   TrendingUp,
   Save,
   Check,
-  AlertTriangle
+  AlertTriangle,
+  Trash2,
+  X
 } from 'lucide-react';
 import CharacterAvatar from '@/components/shared/CharacterAvatar';
 import { PENGUIN_FAMILY, HUMAN_CHARACTERS } from '@/types/characters';
+
+interface ModuleData {
+  id: string;
+  title: string;
+  description: string;
+  ageGroup: string;
+  character: string;
+  branch: string;
+  status: 'draft' | 'published';
+  createdAt: string;
+}
 
 const AdminDashboard: React.FC = () => {
   const { toast } = useToast();
@@ -74,8 +89,14 @@ const AdminDashboard: React.FC = () => {
     branch: ''
   });
 
+  // Module management state
+  const [editingModule, setEditingModule] = useState<ModuleData | null>(null);
+  const [viewingModule, setViewingModule] = useState<ModuleData | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
+
   // Created content storage
-  const [createdModules, setCreatedModules] = useState([
+  const [createdModules, setCreatedModules] = useState<ModuleData[]>([
     {
       id: '1',
       title: 'Digital Citizenship with Pax',
@@ -247,10 +268,10 @@ const AdminDashboard: React.FC = () => {
       return;
     }
     
-    const newModuleData = {
+    const newModuleData: ModuleData = {
       id: Date.now().toString(),
       ...newModule,
-      status: 'draft',
+      status: 'draft' as const,
       createdAt: new Date().toISOString().split('T')[0]
     };
     
@@ -269,6 +290,76 @@ const AdminDashboard: React.FC = () => {
     });
     
     setNewModule({ title: '', description: '', ageGroup: '', character: '', branch: '' });
+  };
+
+  const handleEditModule = (module: ModuleData) => {
+    setEditingModule({ ...module });
+    setIsEditDialogOpen(true);
+  };
+
+  const handleViewModule = (module: ModuleData) => {
+    setViewingModule(module);
+    setIsViewDialogOpen(true);
+  };
+
+  const handleSaveModuleChanges = () => {
+    if (!editingModule.title || !editingModule.character || !editingModule.branch) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setCreatedModules(prev => prev.map(module => 
+      module.id === editingModule.id ? editingModule : module
+    ));
+
+    setRecentActivity(prev => [{
+      id: Date.now().toString(),
+      action: `Module "${editingModule.title}" updated`,
+      user: 'Admin Dashboard',
+      time: 'Just now'
+    }, ...prev]);
+
+    toast({
+      title: "Module Updated",
+      description: `"${editingModule.title}" has been updated successfully.`,
+    });
+
+    setIsEditDialogOpen(false);
+    setEditingModule(null);
+  };
+
+  const handleDeleteModule = (moduleId: string) => {
+    const moduleToDelete = createdModules.find(m => m.id === moduleId);
+    setCreatedModules(prev => prev.filter(module => module.id !== moduleId));
+
+    setRecentActivity(prev => [{
+      id: Date.now().toString(),
+      action: `Module "${moduleToDelete?.title}" deleted`,
+      user: 'Admin Dashboard',
+      time: 'Just now'
+    }, ...prev]);
+
+    toast({
+      title: "Module Deleted",
+      description: `"${moduleToDelete?.title}" has been deleted.`,
+      variant: "destructive",
+    });
+  };
+
+  const handlePublishModule = (moduleId: string) => {
+    setCreatedModules(prev => prev.map(module => 
+      module.id === moduleId ? { ...module, status: 'published' as const } : module
+    ));
+
+    const module = createdModules.find(m => m.id === moduleId);
+    toast({
+      title: "Module Published",
+      description: `"${module?.title}" is now live for students.`,
+    });
   };
 
   const handleRunSafetyCheck = (checkType: string) => {
@@ -453,7 +544,7 @@ const AdminDashboard: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {createdModules.map((module) => (
+                  {createdModules.map((module: ModuleData) => (
                     <div key={module.id} className="flex items-center justify-between p-4 border rounded-lg">
                       <div className="flex items-center space-x-4">
                         <CharacterAvatar 
@@ -485,6 +576,160 @@ const AdminDashboard: React.FC = () => {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Edit Module Dialog */}
+            <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>Edit Module</DialogTitle>
+                  <DialogDescription>
+                    Update the module details below
+                  </DialogDescription>
+                </DialogHeader>
+                {editingModule && (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Module Title *</label>
+                        <Input 
+                          placeholder="e.g., Digital Citizenship"
+                          value={editingModule.title}
+                          onChange={(e) => setEditingModule(prev => ({ ...prev, title: e.target.value }))}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Learning Branch *</label>
+                        <Select value={editingModule.branch} onValueChange={(value) => setEditingModule(prev => ({ ...prev, branch: value }))}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select branch" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="family-values">Family Values</SelectItem>
+                            <SelectItem value="character-building">Character Building</SelectItem>
+                            <SelectItem value="practical-skills">Practical Skills</SelectItem>
+                            <SelectItem value="emotional-intelligence">Emotional Intelligence</SelectItem>
+                            <SelectItem value="community">Community</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Character Guide *</label>
+                        <Select value={editingModule.character} onValueChange={(value) => setEditingModule(prev => ({ ...prev, character: value }))}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select character" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {[...PENGUIN_FAMILY, ...HUMAN_CHARACTERS].map((char) => (
+                              <SelectItem key={char.id} value={char.id}>{char.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Target Age Group</label>
+                        <Select value={editingModule.ageGroup} onValueChange={(value) => setEditingModule(prev => ({ ...prev, ageGroup: value }))}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select age group" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="10-12">10-12 years</SelectItem>
+                            <SelectItem value="13-15">13-15 years</SelectItem>
+                            <SelectItem value="16-18">16-18 years</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Description</label>
+                      <Textarea 
+                        placeholder="Describe the learning objectives and content..."
+                        value={editingModule.description}
+                        onChange={(e) => setEditingModule(prev => ({ ...prev, description: e.target.value }))}
+                        rows={3}
+                      />
+                    </div>
+                    <div className="flex justify-end space-x-2">
+                      <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                        Cancel
+                      </Button>
+                      <Button onClick={handleSaveModuleChanges}>
+                        <Save className="h-4 w-4 mr-2" />
+                        Save Changes
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </DialogContent>
+            </Dialog>
+
+            {/* View Module Dialog */}
+            <Dialog open={isViewDialogOpen} onOpenChange={setIsViewDialogOpen}>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>Module Details</DialogTitle>
+                  <DialogDescription>
+                    View complete module information
+                  </DialogDescription>
+                </DialogHeader>
+                {viewingModule && (
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-4">
+                      <CharacterAvatar characterId={viewingModule.character} size="lg" />
+                      <div>
+                        <h3 className="text-xl font-semibold">{viewingModule.title}</h3>
+                        <p className="text-muted-foreground">{viewingModule.description}</p>
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-4 p-4 bg-muted rounded-lg">
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Learning Branch</label>
+                        <p className="capitalize">{viewingModule.branch?.replace('-', ' ')}</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Age Group</label>
+                        <p>{viewingModule.ageGroup} years</p>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Status</label>
+                        <Badge variant={viewingModule.status === 'published' ? 'default' : 'secondary'}>
+                          {viewingModule.status}
+                        </Badge>
+                      </div>
+                      <div>
+                        <label className="text-sm font-medium text-muted-foreground">Created</label>
+                        <p>{viewingModule.createdAt}</p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Character Guide Details</label>
+                      <div className="p-3 border rounded-lg">
+                        {(() => {
+                          const character = [...PENGUIN_FAMILY, ...HUMAN_CHARACTERS].find(c => c.id === viewingModule.character);
+                          return character ? (
+                            <div>
+                              <p className="font-medium">{character.name}</p>
+                              <p className="text-sm text-muted-foreground">{character.personality}</p>
+                              <p className="text-sm">{character.description}</p>
+                              <p className="text-sm font-medium mt-2">Specialization: {character.specialization}</p>
+                            </div>
+                          ) : (
+                            <p className="text-muted-foreground">Character not found</p>
+                          );
+                        })()}
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end">
+                      <Button onClick={() => setIsViewDialogOpen(false)}>
+                        Close
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </DialogContent>
+            </Dialog>
 
             <div className="grid gap-6 md:grid-cols-2">
               {/* Age Band Customization */}
@@ -629,38 +874,44 @@ const AdminDashboard: React.FC = () => {
                     <div key={prompt.id} className="p-4 border rounded-lg">
                       <div className="flex items-center justify-between mb-2">
                         <h4 className="font-medium">{prompt.moduleTitle}</h4>
-                        <div className="flex space-x-2">
-                          <Button variant="outline" size="sm">
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <div>
-                          <label className="text-sm font-medium text-muted-foreground">Discussion Questions:</label>
-                          <ul className="text-sm mt-1 space-y-1">
-                            {prompt.prompts.map((p, index) => (
-                              <li key={index} className="flex items-start">
-                                <span className="mr-2">•</span>
-                                <span>{p}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                        {prompt.parentGuidance && (
-                          <div>
-                            <label className="text-sm font-medium text-muted-foreground">Parent Guidance:</label>
-                            <p className="text-sm mt-1">{prompt.parentGuidance}</p>
-                          </div>
-                        )}
-                        <p className="text-xs text-muted-foreground">Created: {prompt.createdAt}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                       <div className="flex space-x-2">
+                         <Button 
+                           variant="outline" 
+                           size="sm"
+                         >
+                           <Edit className="h-4 w-4" />
+                         </Button>
+                         <Button 
+                           variant="outline" 
+                           size="sm"
+                         >
+                           <Eye className="h-4 w-4" />
+                         </Button>
+                       </div>
+                       </div>
+                       <div className="space-y-2">
+                         <div>
+                           <label className="text-sm font-medium text-muted-foreground">Discussion Questions:</label>
+                           <ul className="text-sm mt-1 space-y-1">
+                             {prompt.prompts.map((p, index) => (
+                               <li key={index} className="flex items-start">
+                                 <span className="mr-2">•</span>
+                                 <span>{p}</span>
+                               </li>
+                             ))}
+                           </ul>
+                         </div>
+                         {prompt.parentGuidance && (
+                           <div>
+                             <label className="text-sm font-medium text-muted-foreground">Parent Guidance:</label>
+                             <p className="text-sm mt-1">{prompt.parentGuidance}</p>
+                           </div>
+                         )}
+                         <p className="text-xs text-muted-foreground">Created: {prompt.createdAt}</p>
+                       </div>
+                     </div>
+                   ))}
+                 </div>
               </CardContent>
             </Card>
           </TabsContent>
