@@ -1,37 +1,31 @@
 import LandingPage from "../components/LandingPage";
-import LessonPreview from "../components/LessonPreview";
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
 const Index = () => {
-  const [showPreview, setShowPreview] = useState(false);
-
-  if (showPreview) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto py-4">
-          <Button 
-            variant="outline" 
-            onClick={() => setShowPreview(false)}
-            className="mb-4"
-          >
-            ← Back to Landing Page
-          </Button>
-          <LessonPreview />
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div>
       <LandingPage />
-      <div className="fixed bottom-4 right-4">
+      <div className="fixed bottom-4 right-4 flex flex-col gap-2">
         <Button 
-          onClick={() => setShowPreview(true)}
+          onClick={() => window.location.href = '/parent-dashboard'}
           className="shadow-lg"
+          variant="default"
         >
-          🎯 Preview Lesson
+          👨‍👩‍👧‍👦 Parent Dashboard
+        </Button>
+        <Button 
+          onClick={() => window.location.href = '/student-dashboard'}
+          className="shadow-lg"
+          variant="outline"
+        >
+          🎓 Student Dashboard
+        </Button>
+        <Button 
+          onClick={() => window.location.href = '/admin-dashboard'}
+          className="shadow-lg"
+          variant="secondary"
+        >
+          ⚙️ Admin Dashboard
         </Button>
       </div>
     </div>
