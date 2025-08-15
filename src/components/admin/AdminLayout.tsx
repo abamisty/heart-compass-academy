@@ -1,88 +1,41 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { 
-  BookOpen, 
-  Upload, 
-  FileText, 
-  Award, 
-  BarChart3, 
-  Settings,
-  Users,
-  Target,
-  Puzzle,
-  Mic,
-  Image,
-  Video,
-  FileAudio,
-  Plus,
-  Save,
-  Eye,
-  Edit,
-  Trash2,
-  Download,
-  Star,
-  TrendingUp
-} from 'lucide-react';
+import { Outlet } from "react-router-dom";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AdminSidebar } from "./AdminSidebar";
+import { Button } from "@/components/ui/button";
+import { NavLink } from "react-router-dom";
+import { Home, LogOut } from "lucide-react";
 
-interface AdminLayoutProps {
-  children: React.ReactNode;
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
-}
-
-const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeTab, setActiveTab }) => {
+export function AdminLayout() {
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto p-6">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Enteteye Academy Admin
-          </h1>
-          <p className="text-muted-foreground">
-            Comprehensive learning management and content creation platform
-          </p>
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full">
+        {/* Global Header */}
+        <header className="fixed top-0 left-0 right-0 h-14 bg-background border-b z-50 flex items-center justify-between px-4">
+          <div className="flex items-center gap-4">
+            <SidebarTrigger />
+            <h1 className="font-semibold text-lg">Admin Dashboard</h1>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" asChild>
+              <NavLink to="/">
+                <Home className="w-4 h-4 mr-2" />
+                Back to App
+              </NavLink>
+            </Button>
+            <Button variant="ghost" size="sm">
+              <LogOut className="w-4 h-4 mr-2" />
+              Logout
+            </Button>
+          </div>
+        </header>
+
+        <div className="flex w-full pt-14">
+          <AdminSidebar />
+          <main className="flex-1 p-6 bg-muted/10">
+            <Outlet />
+          </main>
         </div>
-
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7 lg:w-fit">
-            <TabsTrigger value="courses" className="flex items-center gap-2">
-              <BookOpen className="h-4 w-4" />
-              <span className="hidden sm:inline">Courses</span>
-            </TabsTrigger>
-            <TabsTrigger value="content" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              <span className="hidden sm:inline">Content</span>
-            </TabsTrigger>
-            <TabsTrigger value="exercises" className="flex items-center gap-2">
-              <Puzzle className="h-4 w-4" />
-              <span className="hidden sm:inline">Exercises</span>
-            </TabsTrigger>
-            <TabsTrigger value="upload" className="flex items-center gap-2">
-              <Upload className="h-4 w-4" />
-              <span className="hidden sm:inline">Upload</span>
-            </TabsTrigger>
-            <TabsTrigger value="gamification" className="flex items-center gap-2">
-              <Award className="h-4 w-4" />
-              <span className="hidden sm:inline">Gamify</span>
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              <span className="hidden sm:inline">Analytics</span>
-            </TabsTrigger>
-            <TabsTrigger value="quality" className="flex items-center gap-2">
-              <Target className="h-4 w-4" />
-              <span className="hidden sm:inline">Quality</span>
-            </TabsTrigger>
-          </TabsList>
-
-          {children}
-        </Tabs>
       </div>
-    </div>
+    </SidebarProvider>
   );
-};
-
-export default AdminLayout;
+}
