@@ -17,133 +17,71 @@ import {
   Settings,
   Heart,
   Target,
-  Zap
+  Zap,
+  MessageSquare,
+  BarChart3,
+  Calendar,
+  CheckCircle
 } from "lucide-react";
-
 import { DuolingoStyleLearningPath } from "@/components/DuolingoStyleLearningPath";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
 const ParentDashboard = () => {
   const [selectedChild, setSelectedChild] = useState(0);
-  const [isAddingChild, setIsAddingChild] = useState(false);
   const [children, setChildren] = useState([
     {
       id: "child-1",
-      name: "Emma",
+      name: "Alex",
       age: 12,
       avatar: "/placeholder-avatar.png",
       level: 15,
       streak: 7,
-      totalBadges: 12,
       coursesCompleted: 3,
-      currentCourse: "Character Values Foundations",
-      progress: 68,
-      weeklyTime: 4.5
-    },
-    {
-      id: "child-2",
-      name: "Alex",
-      age: 15,
-      avatar: "/placeholder-avatar.png",
-      level: 22,
-      streak: 12,
-      totalBadges: 18,
-      coursesCompleted: 5,
-      currentCourse: "Financial Literacy & Sales Skills",
-      progress: 43,
-      weeklyTime: 6.2
+      currentCourse: "Decision Making Mastery",
+      progress: 35,
+      weeklyTime: 4.5,
+      characterTraits: {
+        criticalThinking: 85,
+        responsibility: 72,
+        empathy: 68,
+        integrity: 78
+      }
     }
   ]);
   
   const { toast } = useToast();
   const { user } = useAuth();
-
   const currentChild = children[selectedChild];
 
-  // Handler functions
-  const handleChildAdded = (newChild: any) => {
-    setChildren(prev => [...prev, newChild]);
-  };
-
-  const handleCourseEnroll = async (courseId: string, childId: string) => {
-    try {
-      const { error } = await supabase
-        .from('enrollments')
-        .insert({
-          child_id: childId,
-          course_id: courseId,
-          enrolled_by: user?.id
-        });
-
-      if (error) throw error;
-
-      toast({
-        title: "Course Enrolled",
-        description: `Successfully enrolled ${currentChild.name} in the selected course.`
-      });
-    } catch (error) {
-      console.error('Error enrolling in course:', error);
-      toast({
-        title: "Error",
-        description: "Failed to enroll in course"
-      });
-    }
-  };
-
-  const handleSettingsUpdate = (settings: any) => {
-    // Update child settings logic here
-    console.log("Settings updated:", settings);
-  };
-
-  const recentActivities = [
+  const discussionReadyLessons = [
     {
-      type: "badge",
-      title: "Empathy Explorer Badge Earned",
-      course: "Character Values",
-      time: "2 hours ago",
-      icon: <Heart className="w-4 h-4 text-red-500" />
+      title: "Types of Decisions",
+      completedAt: "today at 3:45 PM",
+      keyPoints: [
+        "Difference between big and small decisions",
+        "How values influence our choices", 
+        "The importance of thinking before acting"
+      ],
+      discussionStarters: [
+        "What was the hardest decision you made this week?",
+        "How do our family values help us make choices?",
+        "Can you think of a time when you made a quick decision vs. a thoughtful one?"
+      ]
     },
     {
-      type: "lesson",
-      title: "Completed: Understanding Different Perspectives",
-      course: "Character Values",
-      time: "1 day ago",
-      icon: <BookOpen className="w-4 h-4 text-blue-500" />
-    },
-    {
-      type: "streak",
-      title: "7-Day Learning Streak!",
-      course: "Overall Progress",
-      time: "Today",
-      icon: <Star className="w-4 h-4 text-yellow-500" />
+      title: "What Are Decisions?",
+      completedAt: "yesterday",
+      isDiscussed: true,
+      note: "Great discussion about daily choices and their impact!"
     }
   ];
 
-  const recommendedCourses = [
-    {
-      title: "Public Speaking Confidence",
-      description: "Build confidence in expressing ideas and opinions",
-      ageGroup: "13-15",
-      duration: "6 weeks",
-      difficulty: "Intermediate"
-    },
-    {
-      title: "Digital Citizenship",
-      description: "Navigate online relationships and digital responsibility",
-      ageGroup: "12-18",
-      duration: "4 weeks",
-      difficulty: "Beginner"
-    },
-    {
-      title: "Emotional Intelligence Mastery",
-      description: "Advanced emotional awareness and management skills",
-      ageGroup: "14-18",
-      duration: "8 weeks",
-      difficulty: "Advanced"
-    }
-  ];
+  const weeklyStats = {
+    lessonsCompleted: 2,
+    familyDiscussions: 1,
+    characterPoints: 45
+  };
 
   return (
     <div className="min-h-screen bg-gradient-hero">
@@ -152,10 +90,10 @@ const ParentDashboard = () => {
         <div className="container mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <Heart className="w-8 h-8 text-primary" />
+              <Users className="w-8 h-8 text-primary" />
               <div>
-                <h1 className="text-2xl font-bold gradient-text">Parent Dashboard</h1>
-                <p className="text-muted-foreground">Track your children's character development journey</p>
+                <h1 className="text-2xl font-bold gradient-text">Parent Dashboard 👨‍👩‍👧‍👦</h1>
+                <p className="text-muted-foreground">Monitor {currentChild.name}'s character development and join meaningful discussions</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -169,13 +107,6 @@ const ParentDashboard = () => {
       </header>
 
       <div className="container mx-auto px-6 py-8">
-        {/* Add Child Button Section */}
-        <div className="flex justify-end mb-6">
-          <Button onClick={() => setIsAddingChild(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Child
-          </Button>
-        </div>
         {/* Child Selector */}
         <div className="flex gap-4 mb-8">
           {children.map((child, index) => (
@@ -204,128 +135,227 @@ const ParentDashboard = () => {
           ))}
         </div>
 
-        {/* Main Dashboard */}
-        <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="learning-path">Learning Path</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="overview" className="space-y-6">
-            {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <Card className="bg-gradient-to-r from-primary/10 to-primary/5">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Current Level</p>
-                      <p className="text-3xl font-bold text-primary">{currentChild.level}</p>
-                    </div>
-                    <Target className="w-8 h-8 text-primary" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-r from-accent/10 to-accent/5">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Learning Streak</p>
-                      <p className="text-3xl font-bold text-accent">{currentChild.streak} days</p>
-                    </div>
-                    <Zap className="w-8 h-8 text-accent" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-r from-success/10 to-success/5">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Badges Earned</p>
-                      <p className="text-3xl font-bold text-success">{currentChild.totalBadges}</p>
-                    </div>
-                    <Trophy className="w-8 h-8 text-success" />
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-gradient-to-r from-secondary/10 to-secondary/5">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-muted-foreground">Weekly Time</p>
-                      <p className="text-3xl font-bold text-secondary">{currentChild.weeklyTime}h</p>
-                    </div>
-                    <Clock className="w-8 h-8 text-secondary" />
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Current Course Progress */}
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Left Column - Progress Overview */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Progress Overview */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <BookOpen className="w-5 h-5 text-primary" />
-                  Current Course Progress
+                  <BarChart3 className="w-5 h-5 text-primary" />
+                  📊 {currentChild.name}'s Learning Progress
                 </CardTitle>
-                <CardDescription>
-                  {currentChild.name} is currently learning: {currentChild.currentCourse}
-                </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="font-medium">{currentChild.currentCourse}</span>
-                    <Badge variant="secondary">{currentChild.progress}% Complete</Badge>
+                <div className="space-y-6">
+                  {/* Course Progress */}
+                  <div>
+                    <h4 className="font-semibold flex items-center gap-2 mb-3">
+                      <BookOpen className="w-4 h-4 text-primary" />
+                      🧠 Decision Making Course
+                    </h4>
+                    <div className="bg-muted/30 p-4 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium">Overall Progress</span>
+                        <span className="text-2xl font-bold text-primary">{currentChild.progress}%</span>
+                      </div>
+                      <Progress value={currentChild.progress} className="h-2 mb-4" />
+                      <div className="grid grid-cols-3 gap-4 text-sm">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle className="w-4 h-4 text-success" />
+                          <span>✅ Completed: 2 lessons</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-4 h-4 text-accent" />
+                          <span>🔄 In Progress: 1 lesson</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Calendar className="w-4 h-4 text-muted-foreground" />
+                          <span>⏳ Remaining: 9 lessons</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <Progress value={currentChild.progress} className="h-3" />
-                  <div className="flex gap-4">
-                    <Button variant="outline" size="sm">
-                      <Eye className="w-4 h-4 mr-2" />
-                      View Details
-                    </Button>
-                    <Button variant="secondary" size="sm">
-                      <TrendingUp className="w-4 h-4 mr-2" />
-                      Progress Report
-                    </Button>
+
+                  {/* Character Traits */}
+                  <div>
+                    <h4 className="font-semibold flex items-center gap-2 mb-3">
+                      <Star className="w-4 h-4 text-yellow-500" />
+                      ⭐ Character Traits
+                    </h4>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-primary mb-1">{currentChild.characterTraits.criticalThinking}%</div>
+                        <div className="text-sm text-muted-foreground">Critical Thinking</div>
+                        <Progress value={currentChild.characterTraits.criticalThinking} className="h-1 mt-1" />
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-accent mb-1">{currentChild.characterTraits.responsibility}%</div>
+                        <div className="text-sm text-muted-foreground">Responsibility</div>
+                        <Progress value={currentChild.characterTraits.responsibility} className="h-1 mt-1" />
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-success mb-1">{currentChild.characterTraits.empathy}%</div>
+                        <div className="text-sm text-muted-foreground">Empathy</div>
+                        <Progress value={currentChild.characterTraits.empathy} className="h-1 mt-1" />
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-secondary mb-1">{currentChild.characterTraits.integrity}%</div>
+                        <div className="text-sm text-muted-foreground">Integrity</div>
+                        <Progress value={currentChild.characterTraits.integrity} className="h-1 mt-1" />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Recent Activity */}
+            {/* Family Discussion */}
             <Card>
               <CardHeader>
-                <CardTitle>Recent Activity</CardTitle>
-                <CardDescription>
-                  Keep track of {currentChild.name}'s latest achievements and progress
-                </CardDescription>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageSquare className="w-5 h-5 text-primary" />
+                  💬 Ready for Family Discussion
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {recentActivities.map((activity, index) => (
-                    <div key={index} className="flex items-center gap-4 p-3 rounded-lg bg-muted/50">
-                      {activity.icon}
-                      <div className="flex-1">
-                        <p className="font-medium">{activity.title}</p>
-                        <p className="text-sm text-muted-foreground">{activity.course}</p>
+                <div className="space-y-6">
+                  {discussionReadyLessons.map((lesson, index) => (
+                    <div key={index} className="border border-border/50 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-3">
+                        <div>
+                          <h4 className="font-semibold">Lesson: {lesson.title}</h4>
+                          <p className="text-sm text-muted-foreground">Completed {lesson.completedAt}</p>
+                        </div>
+                        {lesson.isDiscussed ? (
+                          <Badge variant="secondary" className="text-xs">
+                            Discussed ✓
+                          </Badge>
+                        ) : (
+                          <Button size="sm">Start Discussion</Button>
+                        )}
                       </div>
-                      <Badge variant="outline" className="text-xs">
-                        {activity.time}
-                      </Badge>
+                      
+                      {lesson.isDiscussed ? (
+                        <p className="text-sm text-muted-foreground italic">{lesson.note}</p>
+                      ) : (
+                        <div className="space-y-3">
+                          <div>
+                            <h5 className="font-medium text-sm mb-2">Key Learning Points:</h5>
+                            <ul className="text-sm text-muted-foreground space-y-1">
+                              {lesson.keyPoints?.map((point, idx) => (
+                                <li key={idx}>• {point}</li>
+                              ))}
+                            </ul>
+                          </div>
+                          <div>
+                            <h5 className="font-medium text-sm mb-2">Discussion Starters:</h5>
+                            <ul className="text-sm text-muted-foreground space-y-1">
+                              {lesson.discussionStarters?.map((starter, idx) => (
+                                <li key={idx}>• "{starter}"</li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          </div>
 
-          <TabsContent value="learning-path" className="space-y-6">
-            <DuolingoStyleLearningPath selectedChild={currentChild} />
-          </TabsContent>
-        </Tabs>
+          {/* Right Column - Sidebar */}
+          <div className="space-y-6">
+            {/* This Week Stats */}
+            <Card>
+              <CardHeader>
+                <CardTitle>This Week</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <BookOpen className="w-4 h-4 text-primary" />
+                      <span className="text-sm">📚 Lessons Completed</span>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-primary">{weeklyStats.lessonsCompleted}</div>
+                      <div className="text-xs text-muted-foreground">this week</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <MessageSquare className="w-4 h-4 text-accent" />
+                      <span className="text-sm">💬 Family Discussions</span>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-accent">{weeklyStats.familyDiscussions}</div>
+                      <div className="text-xs text-muted-foreground">Quality conversations</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Star className="w-4 h-4 text-success" />
+                      <span className="text-sm">⭐ Character Points</span>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-success">{weeklyStats.characterPoints}</div>
+                      <div className="text-xs text-muted-foreground">Earned this week</div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Parenting Tips */}
+            <Card>
+              <CardHeader>
+                <CardTitle>💡 Parenting Tips</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <h4 className="font-medium text-sm mb-2">Discussion Tip</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Ask open-ended questions and listen actively. Let Alex share their thoughts before offering guidance.
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-sm mb-2">Reinforcement</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Look for opportunities in daily life to apply the decision-making concepts Alex is learning.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Family Goals */}
+            <Card>
+              <CardHeader>
+                <CardTitle>🎯 Family Goals</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-success" />
+                    <span className="text-sm">Weekly family discussion</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Target className="w-4 h-4 text-primary" />
+                    <span className="text-sm">Practice decision-making together</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Heart className="w-4 h-4 text-accent" />
+                    <span className="text-sm">Share family values stories</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     </div>
   );
