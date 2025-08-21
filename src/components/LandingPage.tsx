@@ -111,7 +111,6 @@ const LandingPage = () => {
             </Button>
           </div>
           
-          {/* Demo Access */}
           <div className="mb-12">
             <p className="text-lg text-muted-foreground mb-4">Try our demo dashboards:</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -131,12 +130,6 @@ const LandingPage = () => {
                 <Button variant="success" size="lg">
                   <BookOpen className="w-5 h-5 mr-2" />
                   Course Player Demo
-                </Button>
-              </Link>
-              <Link to="/curriculum-preview">
-                <Button variant="glow" size="lg">
-                  <Star className="w-5 h-5 mr-2" />
-                  View Curriculum Preview
                 </Button>
               </Link>
             </div>

@@ -20,13 +20,7 @@ import {
   Zap
 } from "lucide-react";
 
-// Import new components
-import { CourseSelectionGrid } from "@/components/parent/CourseSelectionGrid";
 import { DuolingoStyleLearningPath } from "@/components/DuolingoStyleLearningPath";
-import { ProgressReports } from "@/components/parent/ProgressReports";
-import { AchievementTracking } from "@/components/parent/AchievementTracking";
-import { ParentControls } from "@/components/parent/ParentControls";
-import ChildProfileManagement from "@/components/parent/ChildProfileManagement";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -212,13 +206,9 @@ const ParentDashboard = () => {
 
         {/* Main Dashboard */}
         <Tabs defaultValue="overview" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="courses">Courses</TabsTrigger>
             <TabsTrigger value="learning-path">Learning Path</TabsTrigger>
-            <TabsTrigger value="reports">Reports</TabsTrigger>
-            <TabsTrigger value="achievements">Achievements</TabsTrigger>
-            <TabsTrigger value="controls">Controls</TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview" className="space-y-6">
@@ -332,38 +322,10 @@ const ParentDashboard = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="courses" className="space-y-6">
-            <CourseSelectionGrid 
-              selectedChild={currentChild}
-              onCourseEnroll={handleCourseEnroll}
-            />
-          </TabsContent>
-
           <TabsContent value="learning-path" className="space-y-6">
             <DuolingoStyleLearningPath selectedChild={currentChild} />
           </TabsContent>
-
-          <TabsContent value="reports" className="space-y-6">
-            <ProgressReports selectedChild={currentChild} />
-          </TabsContent>
-
-          <TabsContent value="achievements" className="space-y-6">
-            <AchievementTracking selectedChild={currentChild} />
-          </TabsContent>
-
-          <TabsContent value="controls" className="space-y-6">
-            <ParentControls 
-              selectedChild={currentChild}
-              onSettingsUpdate={handleSettingsUpdate}
-            />
-          </TabsContent>
         </Tabs>
-
-        {/* Hidden Child Profile Management Dialog */}
-        <ChildProfileManagement 
-          isAddingChild={isAddingChild}
-          setIsAddingChild={setIsAddingChild}
-        />
       </div>
     </div>
   );

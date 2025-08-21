@@ -6,7 +6,34 @@ import { Progress } from "@/components/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { AnimatedCharacter } from "@/components/video/AnimatedCharacter";
+// Simplified character display component
+const AnimatedCharacter = ({ character, emotion, isActive, size = "md", className = "" }: {
+  character: string;
+  emotion: string;
+  isActive: boolean;
+  size?: "sm" | "md" | "lg";
+  className?: string;
+}) => {
+  const sizeClasses = {
+    sm: "w-12 h-12",
+    md: "w-16 h-16", 
+    lg: "w-20 h-20"
+  };
+  
+  const emotionColors = {
+    happy: "bg-gradient-to-r from-yellow-400 to-orange-400",
+    sad: "bg-gradient-to-r from-blue-400 to-blue-600",
+    worried: "bg-gradient-to-r from-orange-400 to-red-400",
+    surprised: "bg-gradient-to-r from-purple-400 to-pink-400",
+    empathetic: "bg-gradient-to-r from-green-400 to-teal-400"
+  };
+  
+  return (
+    <div className={`${sizeClasses[size]} ${emotionColors[emotion as keyof typeof emotionColors]} rounded-full flex items-center justify-center text-white font-bold ${isActive ? 'animate-pulse ring-2 ring-white' : ''} ${className}`}>
+      {character[0]}
+    </div>
+  );
+};
 import { useTextToSpeech } from "@/hooks/useTextToSpeech";
 import { 
   Play, 

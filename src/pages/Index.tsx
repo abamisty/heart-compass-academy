@@ -33,13 +33,6 @@ const Index = () => {
         >
           🎯 Preview Lesson
         </Button>
-        <Button 
-          variant="outline"
-          onClick={() => window.location.href = '/admin'}
-          className="shadow-lg"
-        >
-          ⚙️ Admin Dashboard
-        </Button>
       </div>
     </div>
   );
